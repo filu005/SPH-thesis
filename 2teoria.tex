@@ -1,0 +1,173 @@
+% 2Teoria
+\newpage
+
+\section{Teoria}
+
+\paragraph{}
+Metoda SPH zastosowana przy symulacji płynów służy m.in. do dyskredyzacji równania Naviera-Stokesa.
+\par
+
+\subsection{Równanie Naviera-Stokesa}
+\label{subsec:navier_stokes_ss}
+
+\paragraph{}
+Izotermiczny płyn opisuje się przy pomocy 3 parametrów: prędkości $v$, gęstości $\rho$ i ciśnienia $p$. W celu opisu wykorzystać można również dwa podejścia charakteryzujące ośrodek: Eulera i Lagrange'a. W tym pierwszym płyn umieszcza się na siatce i jego parametry są obliczane w poszczególnych komórkach tej siatki. Za pomocą wspomnianych trzech parametrów opisuje się postępowanie płynu w czasie za pomocą dwóch równań. Pierwsze równanie <<opisuje>> zasadę zachowania masy:
+\begin{equation}
+\frac{\partial \boldsymbol{p}}{\partial t} + \nabla \boldsymbol{\cdot} (\rho \boldsymbol{v}) = 0
+\label{eqn:mass_conservation}
+\end{equation}
+
+Drugie równanie czyli równanie Naviera-Stokesa opisuje zasadę zachowania pędu (drugą zasadę dynamiki Newtona) w nieściśliwym płynie.
+
+{\sc Równanie Naviera--Stokesa:}
+\begin{equation}
+\rho \left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right) = -\boldsymbol{\nabla} p + \mu \nabla^{2} \boldsymbol{v} + \boldsymbol{F}
+\label{eqn:navier_stokes}
+\end{equation}
+gdzie $\boldsymbol{F}$ oznacza tzw. siły zewnętrzne oddziałujące na płyn a $\mu$ to współczynnik lepkości dynamicznej płynu. Z tego równania wyprowadzimy wyrażenia na siły lepkości i ciśnienia występujące w symulowanym płynie.\\
+Przy opisie Lagrange'a wykorzystuje się cząsteczki. Każda cząsteczka reprezentuje pewną stałą objętość płynu przypisaną do tej cząsteczki i opisaną wspomnianymi powyżej trzema parametrami. Suma wszystkich cząsteczek w całości definiuje płyn. Takie założenia znacząco ułatwiają równania opisujące płyn. Liczba cząsteczek podczas symulacji jest stała co gwarantuje spełnienie zasady zachowania masy. Rówanie \eqref{eqn:mass_conservation} staje się niepotrzebne. Dodatkowo wyrażeie z lewej strony równania \eqref{eqn:navier_stokes}: $\left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right)$ jest równoważne pochodnej materialnej ${D\boldsymbol{v} \over Dt}$ <<ref wiki Operator Stokesa>>. Z definicji opisu Lagrange'a cząsteczka (tj. układ odniesienia) wobec płynu pozostaje nieruchoma - porusza się razem z tym płynem. Dzięki temu stwierdzeniu wyrażenie upraszcza się do pochodnej ${d\boldsymbol{v} \over dt}$.
+\par
+
+\paragraph{}
+Z prawej strony równania \eqref{eqn:navier_stokes} pozostają trzy składniki. Wyrażenie $\left( \boldsymbol{\nabla} p \right)$ opisuje ciśnienie, $\left( \mu \nabla^{2} \boldsymbol{u} \right)$ opisuje lepkość a $\left( \boldsymbol{F} \right)$ to pozostałe siły zewnętrzne (np. grawitacja). Równanie \eqref{eqn:navier_stokes} możemy ostatecznie zapisać jako:
+\begin{equation}
+\boldsymbol{f}_i = -\boldsymbol{\nabla} p_i + \mu \nabla^{2} \boldsymbol{u}_i + \rho_i \boldsymbol{g}
+\label{eqn:navier_stokes_lagrangian}
+\end{equation}
+Zgodnie z drugą zasadą dynamiki wartość działających sił jest proporcjonalna do zmiany pędu w czasie. Zakładając stałość masy <<maso-gęstość>> podczas ruchu przyśpieszenie każdej z cząsteczek można znaleźć następująco:
+\begin{equation}
+\boldsymbol{a}_i = {d\boldsymbol{v}_i \over dt} = {\boldsymbol{f}_i \over \rho_i}
+\label{eqn:acc}
+\end{equation}
+Tak obliczone przyspieszenie posłuży nam do znalezienia pozycji i prędkości w chwili czasowej dla każdej cząsteczki. Metody całkowania zostaną opisane w rozdziale \eqref{subsec:integration_ss}.
+\par
+
+\subsection{Metoda SPH}
+\paragraph{}
+Początkowo metoda SPH została stworzona przez <<ref Lucy>> do symulacji problemów astrofizycznych jednak jest na tyle ogólna, że z powodzeniem znalazła zastosowanie w innych typach modelowań, m.in. w symulacji płynów. Po raz pierwszy SPH do symulacji płynów wykorzystał <<ref Müller>>. Od tamtego czasu ewoluowała w stronę bardziej skomplikowanych algorytmów <<PCISPH>>, <<WCSPH>>, <<wymienić inne SPH>>.\\
+SPH jest metodą interpolacji w układach, w których używa się opisu Lagrange'a, tj. takich gdzie układ odniesienia porusza się razem z cieczą (każda cząsteczka posiada swój własny układ odniesienia). Przy wykorzystaniu SPH pole, które jest zdefiniowane w konkretnych punktach (w położeniach gdzie znajdują się cząsteczki) może zostać opisane dla dowolnego miejsca w przestrzeni. W tym celu wykorzystuje się następujące rówanie:\\
+
+\begin{samepage}
+{\sc Równanie interpolacyjne SPH: }
+\begin{equation}
+A_S(\boldsymbol{r}) = \sum\limits_{j} m_j {A_j \over\rho_j}W(\boldsymbol{r}-\boldsymbol{r}_j, h)
+\label{eqn:sph}
+\end{equation}
+gdzie:
+
+\begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
+\renewcommand\labelitemi{--}
+\item $ A_S $ - interpolacja pola w pozycji $\boldsymbol{r}$
+\item $j$ - cząsteczki po których następuje iteracja
+\item $m_j$ - masa $j$-tej cząsteczki
+\item $\boldsymbol{r}_j$ - pozycja $j$-tej cząsteczki
+\item $\rho_j$ - gęstość $j$-tej cząsteczki
+\item $A_j$ - wartość pola w punkcie $\boldsymbol{r}_j$
+\item $W(\boldsymbol{r}-\boldsymbol{r}_j, h)$ - jądro wygładzające dla j-tej cząsteczki (tj. jej odległości od pozycji $\boldsymbol{r}$: $\| \boldsymbol{r}-\boldsymbol{r}_j \|$)
+\end{itemize}
+\end{samepage}
+\vspace{3ex}
+Przy wykorzystaniu powyższego równania da się opisać poszczególne składniki równania Navier'a-Stokes'a \eqref{eqn:navier_stokes_lagrangian} opisane w rozdzale \eqref{subsec:navier_stokes_ss}. Opis ten znajduje się w następnym rozdziale.
+\par
+
+\paragraph{}
+Istotną właściwością SPH jest łatwość wyliczania pochodnych przestrzennych w postaci gradientu i laplasjanu pola <<skalarnego>>. Gradient pola $A_S(\boldsymbol{r})$ w notacji SPH zapisuje się jako:
+\begin{equation}
+\nabla A_S(\boldsymbol{r}) = \sum\limits_{j} m_j {A_j \over\rho_j} \nabla W(\boldsymbol{r}-\boldsymbol{r}_j, h)
+\label{eqn:sph_grad}
+\end{equation}
+lub w precyzyjniejszej formie gradient pola skalarnego można zapisać jako <<ref kelager 3.11>>:
+\begin{equation}
+\nabla A_S(\boldsymbol{r}) = \rho \sum\limits_{j} m_j \left( {A \over \rho^2} + {A_j \over \rho_j^2} \right) \nabla W(\boldsymbol{r}-\boldsymbol{r}_j, h)
+\label{eqn:sph_grad_prec}
+\end{equation}
+Laplasjan pola $A_S(\boldsymbol{r})$ zapisuje się jako:
+\begin{equation}
+\nabla^2 A_S(\boldsymbol{r}) = \sum\limits_{j} m_j {A_j \over\rho_j} \nabla^2 W(\boldsymbol{r}-\boldsymbol{r}_j, h)
+\label{eqn:sph_lap}
+\end{equation}
+\par
+
+\subsubsection{Jądra wygładzające}
+
+\paragraph{}
+Funkcja $W(\boldsymbol{r}, h)$ to jądro wygładzające (ang. smoothing kernel) o promieniu $h$. Taka funkcja musi spełniać dwa następujące warunki:
+\begin{itemize}
+\item normalizacja: $$\int_{\Omega} W(\boldsymbol{r}, h) d\boldsymbol{r} = 1$$
+\item zbieżność do delty Diraca przy $h$ dążącym do 0: $$\lim_{h\to0} W(\boldsymbol{r}, h) = \delta(\boldsymbol{r})$$
+\end{itemize}
+\vspace{3ex}
+\noindent
+Oprócz powyższych warunków funkcja jądra wygładzającego musi być dodatnia: $$W(\boldsymbol{r}, h) \ge 0$$ aby mogła pełnić rolę uśredniającą. Kiedy dodamy jeszcze jeden warunek funkcji jądra - symetrię: $$W(\boldsymbol{r}, h) = W(\boldsymbol{-r}, h)$$ wtedy interpolacja jest drugiego stopnia precyzji, to znaczy że błąd przybliżenia sumowania w równaniu~\eqref{eqn:sph} jest równy $O(h^{2})$ lub lepszy. Jądro zanika dla promienia większego od $\boldsymbol{r}$: $$W(\boldsymbol{r}, h) = 0, \| \mathbf{r} \| > h$$
+\par
+
+\paragraph{}
+Dla zastosowań SPH, w oparciu o powyższe założenia, projektuje się różne funkcje jąder wygładzających. Od nich w dużym stopniu zależy stabilność, dokładność i wydajność metody. Za idealna funkcje jądra uważa się krzywą Gaussa. Jej obliczenie jest jednak skomplikowane (przez zawartą funkcję eksponent) dlatego w praktyce stosuje się prostsze funkcje przypominające tą krzywą.\\
+\indent Do większości obliczeń korzysta się z jądra wygładzającego opisanego stosunkowo tanią obliczeniowo funkcją wielomianową $W_{poly6}$:
+
+\begin{equation}
+W_{poly6}(\boldsymbol{r}, h) = {315 \over 64 \pi h^9}
+\begin{cases}
+\left(h^2 - \| \mathbf{r} \|^2\right)^3 & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\begin{equation}
+\nabla W_{poly6}(\boldsymbol{r}, h) = {945 \over 32 \pi h^9}
+\begin{cases}
+\mathbf{r} \left(h^2 - \| \mathbf{r} \|^2\right)^2 & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\begin{equation}
+\nabla^2 W_{poly6}(\boldsymbol{r}, h) = {945 \over 32 \pi h^9}
+\begin{cases}
+\left(h^2 - \| \mathbf{r} \|^2\right)\left(\| \mathbf{r} \|^2 - {3 \over 4}(h^2 \| \mathbf{r} \|^2)\right) & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+
+Powyższe jądro wykorzystywane jest przy interpolacji gęstości, ciśnienia oraz pola kolorowego. Przy obliczaniu gradientu ciśnienia oraz siły lepkości, z racji natury oddziaływania tych sił, konieczne jest zastosowanie innych jąder wygładzających.\\
+\indent W przypadku zastosowania jądra $W_{poly6}$ przy obliczaniu siły ciśnienia cząsteczki mają tendencję do <<zlepiania, gromadzenia>> się. Dla małych odległości pomiędzy cząsteczkami gradient tego jądra wykorzystywany do obliczania ciśnienia pomiędzy cząsteczkami dąży do zera i siła odpychająca cząsteczki zanika. Ten problem rozwiązuje się korzystając z innego jądra wygładzającego - $W_{spiky}(\boldsymbol{r}, h)$:
+\begin{equation}
+W_{spiky}(\boldsymbol{r}, h) = {15 \over \pi h^6}
+\begin{cases}
+\left(h - \| \mathbf{r} \|\right)^3 & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\begin{equation}
+\nabla W_{spiky}(\boldsymbol{r}, h) = -{45 \over \pi h^6}
+\begin{cases}
+{\mathbf{r} \over {\| \mathbf{r} \|}} \left(h - \| \mathbf{r} \|\right)^2 & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+Gradient tego jądra pozostaje niezerowy dla argumentów w pobliżu zera, co generuje odpowiednie siły odpychające. Spełnia również pozostałe warunki konieczne dla jąder wygładzających.\\
+\indent Do obliczenia siły lepkości konieczne jest wprowadzenie jeszcze jednego jądra wygładzającego. Lepkość jest zjawiskiem, które - spowodowane tarciem - prowadzi do rozproszenia energii kinetycznej płynu w postaci ciepła. Laplasjan takiego jądra musi być dodatni aby zjawisko lepkości było poprawnie odwzorowywane. Stosuje się tutaj jądro wygładzające $W_{viscosity}(\boldsymbol{r}, h)$ opisane następującym wzorem:
+\begin{equation}
+W_{viscosity}(\boldsymbol{r}, h) = {15 \over 2 \pi h^3}
+\begin{cases}
+\left( -{ {\| \mathbf{r} \|}^3 \over 2 h^3 } + { {\| \mathbf{r} \|}^2 \over h^2 } + { h \over 2 {\| \mathbf{r} \|} } - 1 \right) & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\begin{equation}
+\nabla W_{viscosity}(\boldsymbol{r}, h) = {15 \over 2 \pi h^3}
+\begin{cases}
+\mathbf{r} \left( -{ 3{\| \mathbf{r} \|} \over 2 h^3 } + { 2 \over h^2 } - { h \over 2 {\| \mathbf{r} \|}^3 } \right) & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\begin{equation}
+\nabla^2 W_{viscosity}(\boldsymbol{r}, h) = {45 \over \pi h^6}
+\begin{cases}
+\left( h - {\| \mathbf{r} \|} \right) & 0 \le \| \mathbf{r} \| \le h \\
+0 & \| \mathbf{r} \| > h
+\end{cases}
+\end{equation}
+\par
+
+\paragraph{}
+
+\par

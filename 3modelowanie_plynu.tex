@@ -1,0 +1,152 @@
+% 3modelowanie_plynu
+\newpage
+
+\section{Modelowanie płynu}
+
+\paragraph{}
+Dzięki metodzie SPH można modelować poszczególne elementy równania Naviera-Stokesa, wyróżnione w rozdziale \eqref{eqn:navier_stokes} opisane w punkcie \eqref{subsec:navier_stokes_ss}.
+\par
+\paragraph{}
+\indent Konstrukcja tego akapitu odpowiadakolejności obliczania elementów składających się na implementację metody SPH. W pierwszym kroku obliczana jest wartość gęstości dla wszystkich cząsteczek. Następnie znajdywane są siły z jakimi oddziaływują na siebie cząsteczki. Wypadkowa suma sił służy do obliczenia przyśpieszenia każdej z cząsteczek. Dalej następuje wykrycie i odpowiedź na ewentualne kolizje cząsteczek ze ścianami. Ostatnim krokiem jest całkowanie gdzie symulacja postępuje, zgodnie z obliczonym wcześniej przyśpieszeniem.
+\par
+
+\subsection{Gestość <<maso-gęstość>> i ciśnienie <<lokalne>>}
+
+\paragraph{}
+Zamin zostaną obliczone siły pomiędzy cząsteczkami, konieczne jest znalezienie ich masy oraz gęstości. Masa każdej cząsteczki jest identyczna oraz stała przez cały czas symulacji. Wartość gęstości natomiast jest zmienna i trzeba ją obliczać na początku każdej iteracji symulacji. Poprzez podstawienie do wzoru \eqref{eqn:sph} otrzymujemy wzór na gęstość w punkcie $\boldsymbol{r}$:
+\begin{equation}
+\rho_i(\boldsymbol{r}_i) = \sum\limits_{j} m_j {\rho_j \over\rho_j}W(\boldsymbol{r}_i-\boldsymbol{r}_j, h) = \sum\limits_{j} m_j W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:sph_density}
+\end{equation}
+Następnie za pomocą równania gazu doskonałego może zostać obliczone ciśnienie. W symulacji wykorzystuje się zmodyfikowaną formę równania gazu doskonałego:
+\begin{equation}
+p_i = k(\rho_i - \rho_0)
+\label{eqn:sph_desbrun_pressure}
+\end{equation}
+gdzie $k$ to stała gazowa zależna od temperatury, stała $\rho_0$ oznacza tzw. gęstość spoczynkową, a $\rho_i$ to gęstość obliczona równaniem \eqref{eqn:sph_density}. <<słowo komentarza>> <<w innych pracach gęstość jest czasem nazywana mass-density>>
+\par
+
+\subsection{Siły}
+\label{subsec:forces_ss}
+
+\paragraph{}
+Przy pomocy <<notacji>> SPH wyprowadzam równania na składniki równania Naviera-Stokesa
+\par
+
+\subsubsection{Ciśnienie}
+
+\paragraph{}
+<<zależy od gradientu ciśnienia>>
+\begin{equation}
+\boldsymbol{F}_i^{cisn} = -\nabla p(\boldsymbol{r}_i) = - \sum\limits_{j} {m_j \over \rho_j} p_j \nabla W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:sph_force_pressure_1}
+\end{equation}
+
+Niestety tak przedstawiona siła ciśnienia nie jest symetryczna. Takie oddziaływanie cząsteczek można przedstawić w przypadku interakcji dwóch cząsteczek: przy liczeniu siły ciśnienia pierwsza cząsteczka $i$ wykorzystuje jedynie wartość ciśnienia drugiej cząsteczki $p_j$, i na odwrót. <<$p_i$ i $p_j$ są różne>> W ten sposób łamana jest III zasada dynamiki Newtona - siły wzajemnego oddziaływania cząsteczek nie mają takich samych wartości. Aby rozwiązać problem asymetryczności w tym miejscu stosuje się alternatywny wzór SPH \eqref{eqn:sph_grad_prec} na gradient pola:
+
+\begin{equation}
+\boldsymbol{F}_i^{cisn} = -\nabla p(\boldsymbol{r}_i) = - \rho_j \sum\limits_{j} m_j \left( {p_i \over \rho_i^2} + {p_j \over \rho_j^2} \right) \nabla W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:sph_force_pressure}
+\end{equation}
+
+\par
+
+\subsubsection{Lepkość}
+
+\paragraph{}
+<<zależy od pola prędkości>>
+\begin{equation}
+\boldsymbol{F}_i^{lep} = \mu \nabla^2 \boldsymbol{v}(\boldsymbol{r}_i) = \mu \sum\limits_{j} {m_j \over \rho_j} \boldsymbol{v}_j \nabla^2 W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:sph_force_viscosity_1}
+\end{equation}
+
+Podobnie jak w przypadku siły ciśnienia, tak przedstawiona siła lepkości jest asymetryczna. Korzystając jednak z <<tego, że>> lepkość zależy nie tyle od bezwzględnej prędkości płynu ale od różnic prędkości w płynie, naturalnym sposobem symetryzacji jest podstawienie w miejsce prędkości $\boldsymbol{v}_j$ różnic prędkości dwóch cząsteczek:
+\begin{equation}
+\boldsymbol{F}_i^{lep} = \mu \nabla^2 \boldsymbol{v}(\boldsymbol{r}_i) = \mu \sum\limits_{j} {m_j \over \rho_j} (\boldsymbol{v}_i - \boldsymbol{v}_j) \nabla^2 W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:sph_force_viscosity}
+\end{equation}
+\par
+
+\subsubsection{Napięcie powierzchniowe}
+
+\paragraph{}
+%W proponowanym przez <<Muller>> podejściu 
+Siła napięcia powierzchniowego nie jest wyrażona w równaniu Naviera-Stokesa - jest ona jednak traktowana jako jeden z warunków brzegowych. Trzeba ją zatem obsłużyć osobno. Cząsteczki w płynie przyciągają się ze swoimi sąsiadami poprzez wzajemne oddziaływania. Podczas gdy wewnątrz płynu te oddziaływania się równoważą, na powierzchni płynu - gdzie występuje kontakt z innym ośrodkiem (np. powietrzem) - równowaga sił nie jest zachowana. W tym miejscu do gry wchodzi dodatkowa siła nazywana właśnie napięciem powierzchniowym. Powoduje ona dociskanie cząsteczek `brzegowych' w kierunku normalnym do powierzchni płynu, o zwrocie `do' tej powierzchni. Jednocześnie siła zmierza do minimalizacji zakrzywienia powierzchni. Im większe jest zakrzywienie powierzchni tym większa jest ta siła. Prowadzi to do `wypłaszczenia' powierzchni płynu.\\
+Zgodnie z powyższym paragrafem napięcie powierzchniowe zostanie obliczone jedynie dla cząsteczek będących na powierzchni płynu. Znaleźć je można poprzez tzw. pole kolorowe (ang. color field). Pole to przyjmuje wartość 1 wewnątrz objętości płynu (tj. wszędzie tam gdzie znajdują się cząsteczki) i 0 w pozostałych miejscach.:
+\begin{equation}
+{c}_S(\boldsymbol{r}_i) = \sum\limits_{j} {m_j \over \rho_j} W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)
+\label{eqn:color_field}
+\end{equation}
+Obliczając gradient tego pola uzyskuje się informację o <<normalnych/wektorach prostopadłych do>> powierzchni płynu, skierowanych do jego wnętrza:
+\begin{equation}
+\boldsymbol{n}_i = \nabla{c}_S(\boldsymbol{r}_i)
+\label{eqn:color_field_grad}
+\end{equation}
+Dywergencja gradientu pola to pole skalarne oznaczające długość wektorów normalnych powierzchni. Długości poszczególnych wektorów oznaczają wielkość zakrzywienia powierzchni w danym miejscu (tj. w miejscu cząsteczki $i$):
+\begin{equation}
+\kappa_i = -{\nabla^2{c}_S(\boldsymbol{r}_i) \over \|\boldsymbol{n}_i\|}
+\label{eqn:color_field_div}
+\end{equation}
+Minus w powyższym równaniu pozwala na uzyskiwanie dodatnich wartości zakrzywienia dla powierzchni wypukłych.\\
+Łącząc poszczególne elementy otrzymujemy wzór na siłę działającą na jednostkę powierzchni płynu (ang. surface traction):
+\begin{equation}
+\boldsymbol{t} = \sigma \kappa {\boldsymbol{n} \over \|\boldsymbol{n}\|}
+\label{eqn:force_surface_traction}
+\end{equation}
+Występująca w nim stała $\sigma$ oznacza współczynnik napięcia powierzchniowego charakterystyczny dla substancji tworzącej płyn.\\
+Aby obliczana siła była aplikowana tylko do cząsteczek znajdujących się na powierzchni wzór \eqref{eqn:force_surface_traction} mnoży się przez znormalizowane pole skalarne $\delta = \|\boldsymbol{n}\|$, które maleje wraz z oddalaniem się od powierzchni płynu (jest niezerowe jedynie dla cząsteczek na powierzchni). Ostatecznie wzór na siłę napięcia powierzchniowego wygląda następująco:
+\begin{equation}
+\boldsymbol{F}_i^{pow} = \delta_i \boldsymbol{t}_i = \sigma \kappa_i \boldsymbol{n}_i = - \sigma \nabla^2{c}_S(\boldsymbol{r}_i) {\boldsymbol{n}_i \over \|\boldsymbol{n}_i\|}
+\label{eqn:sph_force_surface_tension}
+\end{equation}
+Jak zostało wspomniane powyżej, wartość $\|\boldsymbol{n}\|$ jest mała dla cząstek `wewnątrz' płynu. Dzieląc przez tą wartość w powyższym równaniu wprowadza się potencjalną niestabilność numeryczną. Rozwiązaniem tego problemu jest obliczanie tego rówanania jedynie dla wartości $\|\boldsymbol{n}\|$ przekraczających pewien stały próg $l$:
+\begin{equation}
+\|\boldsymbol{n}_i\| \geq l
+%\label{eqn:}
+\end{equation}
+gdzie $l > 0$.\\
+%wyłuskać
+%W ten sposób
+\par
+
+\subsubsection{Siły zewnętrzne}
+
+\paragraph{}
+Do symulacji można swobodnie dodawać kolejne siły, które wpływają na zachowanie się płynu. Może być to siła wywoływana przez interakcje użytkownika lub siła symulująca środowisko w jakim znajduje się płyn, np. siła grawitacji czy siła powstała na skutek kolizji płynu z <<obiektem stałym>>.
+\par
+
+
+\subsection{Obsługa kolizji cząstek ze ścianami}
+
+\paragraph{}
+{\noindent\color{red}>> spreżyste typu kelager\\}
+{\color{red}>> ambitniejsze sposoby: Interactive Simulation of Contrast Fluid using Smoothed Particle Hydrodynamics; A.Grahn}
+\par
+
+\subsection{Symulacja}
+\label{subsec:integration_ss}
+
+\paragraph{}
+{\color{red}>> Dyskusja nt. schematów}
+\par
+
+\subsubsection{Schemat Verleta}
+\paragraph{}
+Do całkowania równania \eqref{eqn:acc} wykorzystywany jest schemat Verleta <<ref kelager i link poniżej>>. Kolejne położenia cząstek są obliczane następującym wzorem:
+\begin{equation}
+\boldsymbol{r}_{t+\Delta t} = 2\boldsymbol{r}_t - \boldsymbol{r}_{t-\Delta t} + a_t\Delta t^2
+\label{eqn:verlet_pos_int}
+\end{equation}
+gdzie [$\boldsymbol{r}_{t-\Delta t}$, $\boldsymbol{r}_{t}$, $\boldsymbol{r}_{t+\Delta t}$] to położenia cząstki w kolejnych trzech chwilach czasowych, ${\Delta t}$ to wilekość kroku czasowego a $a_t$ to przyspieszenie wynikające z wypadkowych sił (opisanych w sekcji \eqref{subsec:forces_ss}) działających na cząstkę w danej chwili czasowej. Prędkość cząstki wylicza się na podstawie położenia w dwóch następnych chwilach czasowych:
+\begin{equation}
+\boldsymbol{v}_{t+\Delta t} = {\boldsymbol{r}_{t+\Delta t} - \boldsymbol{r}_{t} \over \Delta t}
+\label{eqn:verlet_vel_int}
+\end{equation}
+{\color{red}\\>> Verlet: http://www.saylor.org/site/wp-content/uploads/2011/06/MA221-6.1.pdf}
+\par
+
+\subsubsection{Schemat Leap-frog}
+\paragraph{}
+
+\par
+
