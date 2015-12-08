@@ -4,25 +4,51 @@
 \section{Wizualizacja płynu}
 
 \paragraph{}
-{\color{red}>> Marching Cubes\\}
-{\color{red}>> ciekawsze i wydajniejsze: Interactive SPH Simulation and Rendering on the GPU; P. Goswami}
+Wizualizacja płynu opiera się na metodzie opisanej w pracy <<Goswami>>. W tym podejściu powierzchnia płynu reprezentowana jest przez pole wokseli. Każdy woksel zawiera dystans do najbliższej powierzchni. W ten sposób reprezentuje tzw. mapę odległości (ang. distance field). <<foto jakiegos DF w 2d>>
+Głównymi elementami opisywanej metody wizualizacji są: znalezienie cząsteczek na powierzchni płynu, konstrukcja mapy odległości oraz przeprowadzenie raycastingu.
+\par
+<<coś o MC z distance field>>
 \par
 
-\subsection{Rekonstrukcja powierzchni}
+\subsection{Znalezienie cząsteczek powierzchniowych}
 
 \paragraph{}
-<<color field, inne (P. Goswami)>>
+Cząsteczki, które nie leżą na powierzchni płynu nie są potrzebne do jego wizualizacji i mogą zostać pominięte. Znacznie zmniejsza to koszt generacji mapy odległości za czym idzie przyśpieszenie procesu wizualizacji.
+\par
+Znalezienie cząsteczek leżacych na powierzchni można przeprowadzić różnymi metodami. Jedna z nich wykorzystuje pole kolorowe (ang. color field) wykorzystywane przy obliczaniu napięcia powierzchniowego płynu. Ja zdecydowałem się jednak zaimplementować podejście oparte na obliczaniu odległości danej cząsteczki do punktu środka masy (ang. center of mass).
+\par
+Cząsteczka $i$ jest zaliczana do cząsteczek powierzchniowych jeżeli jej dystans do środka masy $\boldsymbol{r}_{CM_{i}}$ jej sąsiedztwa jest większy niż pewna określona wartość. Środek masy można obliczyć poprzez zsumowanie pozycji wszystkich sąsiadujących cząsteczek (w układzie odniesienia $i$-tej cząsteczki) ważone przez masę cząsteczek:
+\begin{equation}
+\boldsymbol{r}_{CM_{i}} = {{\sum\limits_{j} {m_j \boldsymbol{r}_{j}}} \over {\sum\limits_{j} {m_j}}}
+\label{eqn:center_mass}
+\end{equation}
+Okazuje się jednak, że powyższy warunek jest niewystarczający w miejscach gdzie występuje niewiele cząsteczek. Dodatkowym <<warunkeim>> jest automatyczne zaliczenie cząsteczki do powierzchniowych gdy liczba cząsteczek w jej sąsiedztwie jest poniżej pewnego progu.
+\par
+Jeżeli cząsteczka spełnia powyższe warunki, wpisywana jest do odpowiedniej tablicy. W przeciwnym wypadku jest po prostu pomijana.
+\par
+<<color field>>
 \par
 
-\subsection{Marching Cubes}
+\subsection{Konstrukcja mapy odległości}
 
 \paragraph{}
-<<opis algorytmu>>
+Mapa odległości zbudowana jest z jednorodnej trójwymiarowej siatki wokseli. Gęstość tej siatki ma istatne znaczenie dla wydajności jak i jakości odwzorowania płynu. Siatka o większej ilości wokseli pozwala na zachowanie większej ilości szczegółów ale wymaga więcej czasu na zbudowanie - czas ten rośnie w tempie $O(n^3)$. Wpływ na szybkość konstrukcji mapy ma również ilość cząsteczek powierzchniowych.
+\par
+Podejście proponowane przez <<Goswami>> wygląda następująco: siatka wokseli inicjowana jest wartością maksymalną $r_{max}$ <<$r_{min}< r < r_{max}$?>>. Dana cząsteczka $i$ otaczana jest sześcianem o boku długości $r$. Dla kadego woksela znajdującego się wewnątrz tego sześcianu obliczany jest dystans $d$ do cząsteczki $i$. Wartość woksela określana jest według następującego wzoru:
+\begin{equation}
+d_v = min(d, d_v^{old})
+\label{eqn:distance_field}
+\end{equation}
+Jeśli $d$ jest mniejsze niż $r_{min}$, to wokselowi zostaje przypisana wartość $r_{min}$. <<teoretycznie $r_{max} = r\sqrt{3}$, $r_{min} = c::xyzminV$>>
+\par
+<<voxel-based, szacowanie dystansu do powierzchni w obrębie sąsiedztwa>>
 \par
 
 
-\subsection{Renderowanie płynu}
+\subsection{Renderowanie - GPU raycasting}
 
 \paragraph{}
-<<opengl, shadery GLSL>>
+W ostatnim kroku wizualizacji płynu dane zawarte w mapie odległości (przechowywanej w pamięci karty graficznej jako tekstura 3D) poddawane są procesowi raycastingu. Raycasting polega na przeprowadzeniu promienia przez renderowany obszar dla każdego fragmentu (piksela) obrazu; Dla każdego piksela wykonywany jest mały program - fragment shader - który inicjuje promień zberający krok po kroku próbki z danej objętości. Początek i koniec promienia muszą być znane przed uruchomieniem shadera. Dane te uzyskuje <<się>> przez uprzednie przeprowadzenie podwójnego 
+\par
+<<'volume rendering', shadery, raycasting>>
 \par

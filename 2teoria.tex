@@ -4,7 +4,7 @@
 \section{Teoria}
 
 \paragraph{}
-Metoda SPH zastosowana przy symulacji płynów służy m.in. do dyskredyzacji równania Naviera-Stokesa.
+Metoda SPH zastosowana przy symulacji płynów służy m.in. do dyskretyzacji równania Naviera-Stokesa.
 \par
 
 \subsection{Równanie Naviera-Stokesa}
@@ -25,7 +25,7 @@ Drugie równanie czyli równanie Naviera-Stokesa opisuje zasadę zachowania pęd
 \label{eqn:navier_stokes}
 \end{equation}
 gdzie $\boldsymbol{F}$ oznacza tzw. siły zewnętrzne oddziałujące na płyn a $\mu$ to współczynnik lepkości dynamicznej płynu. Z tego równania wyprowadzimy wyrażenia na siły lepkości i ciśnienia występujące w symulowanym płynie.\\
-Przy opisie Lagrange'a wykorzystuje się cząsteczki. Każda cząsteczka reprezentuje pewną stałą objętość płynu przypisaną do tej cząsteczki i opisaną wspomnianymi powyżej trzema parametrami. Suma wszystkich cząsteczek w całości definiuje płyn. Takie założenia znacząco ułatwiają równania opisujące płyn. Liczba cząsteczek podczas symulacji jest stała co gwarantuje spełnienie zasady zachowania masy. Rówanie \eqref{eqn:mass_conservation} staje się niepotrzebne. Dodatkowo wyrażeie z lewej strony równania \eqref{eqn:navier_stokes}: $\left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right)$ jest równoważne pochodnej materialnej ${D\boldsymbol{v} \over Dt}$ <<ref wiki Operator Stokesa>>. Z definicji opisu Lagrange'a cząsteczka (tj. układ odniesienia) wobec płynu pozostaje nieruchoma - porusza się razem z tym płynem. Dzięki temu stwierdzeniu wyrażenie upraszcza się do pochodnej ${d\boldsymbol{v} \over dt}$.
+Przy opisie Lagrange'a wykorzystuje się cząsteczki. Każda cząsteczka reprezentuje pewną stałą objętość płynu przypisaną do tej cząsteczki i opisaną wspomnianymi powyżej trzema parametrami. Suma wszystkich cząsteczek w całości definiuje płyn. Takie założenia znacząco ułatwiają równania opisujące płyn. Liczba cząsteczek podczas symulacji jest stała co gwarantuje spełnienie zasady zachowania masy. Rówanie \eqref{eqn:mass_conservation} jest zawsze spełnione. Dodatkowo wyrażenie z lewej strony równania \eqref{eqn:navier_stokes}: $\left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right)$ jest równoważne pochodnej materialnej ${D\boldsymbol{v} \over Dt}$ <<ref wiki Operator Stokesa>>. Z definicji opisu Lagrange'a cząsteczka (tj. układ odniesienia) wobec płynu pozostaje nieruchoma - porusza się razem z tym płynem. Dzięki temu stwierdzeniu wyrażenie upraszcza się do pochodnej ${d\boldsymbol{v} \over dt}$.
 \par
 
 \paragraph{}

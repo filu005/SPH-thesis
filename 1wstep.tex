@@ -20,16 +20,12 @@
 \paragraph{}
 Symulacja płynów jest stosunkowo złożonym i skomplikowanym problemem. W ostatnim dziesięcioleciu staje się jednak coraz bardziej popularnym tematem opracowań naukowych. Obliczeniowa mechanika płynów (ang. \textbf{C}omputational \textbf{F}luid \textbf{D}ynamics) wykorzystuje metody numeryczne oraz stale rosnącą moc obliczeniową komputerów do rozwijania tej dyscypliny. Powodem złożoności zachowania płynów jest skomplikowany mechanizm działania różnych zjawisk składających się na pełen <<obraz>> płynów, takich jak turbulentność, laminarność czy napięcie powierzchniowe płynu.\\
 Symulacje płynu można przeprowadzać w dwojaki sposób: offline i online.
-Metody offline zapewniają największą dokładność obliczeń. Oprogramowania stosujące te techniki wykorzystywane są m.in. w przemyśle motoryzacyjnym, lotniczym i kosmicznym gdzie precyzja kalkulacji jest bardzo istotna. Do dyskretyzacji wykorzystują metodę elementów skończonych lub metodę różnic skończonych.\\
-Metody online są mniej dokładne. Sprawdzają się jednak w symulacjach w czasie rzeczywistym lub sytuacjach gdzie wymagana jest interakcja z płynem. Te metody wykorzystywane są również we wspomnianych powyżej gałęziach przemysłu, jednak są przydatne jedynie na etapie projektowania. Poza tym metody online znajdują zastosowanie w symulacjach medycznych lub grach wideo.
-\par
-
-\subsection{Powiązane prace (?)}
-\paragraph{}
+Metody offline zapewniają największą dokładność obliczeń. Oprogramowania stosujące te techniki wykorzystywane są m.in. w przemyśle motoryzacyjnym, lotniczym i kosmicznym gdzie precyzja kalkulacji jest bardzo istotna. Metody dokładne sprowadzają się do rozwiązania równań Naviera-Stokesa.\\
+W ramach tej pracy wykonano symulacje zachowania płynów w oparciu o metodę online -- SPH (Smoothed Particle Hydrodynamics), która wykorzystuje podejście znane z dynamiki molekularnej i używa wariantu dynamiki Newtonowskiej z parametrami, które mają symulować zachowanie cieczy realnej. Sprawdzają się jednak w symulacjach w czasie rzeczywistym lub sytuacjach gdzie wymagana jest <<interakcja z płynem>>. Te metody wykorzystywane są również we wspomnianych powyżej gałęziach przemysłu, jednak są przydatne jedynie na etapie projektowania. Poza tym metody online znajdują zastosowanie w symulacjach medycznych lub grach wideo.
 \par
 
 \subsection{Mój wkład -- założenia}
 \paragraph{}
 W niniejszej pracy moim celem było zaprezentowanie metody zdolnej do symulacji płynu w czasie rzeczywistym. Głównym założeniem pracy była możliwość interakcji z płynem w stosunkowo dużej skali przy zachowaniu satysfakcjonującej wydajności. Mój wybór, przy sugestii promotora, padł na metodę, która zdobywa w ostatnim dziesięcioleciu najwięcej rozgłosu: Smoothed Particle Hydrodynamics (pol. wygładzonej hydrodynamiki cząstek).\\
-Osobnym krokiem w ramach symulacji płynu jest jego wizualizacja, która sprowadza się do dwóch elementów: wydobywania powierzchni płynu oraz jej renderowania. Ten fragment często pochłania najwięcej czasu symulacji i kluczowym jest znalezienie efektywnego rozwiązania. W niniejszej pracy przedstawiona zostało jedno y możliwych rozwiązań tego problemu.
+Osobnym krokiem w ramach symulacji płynu jest jego wizualizacja, która sprowadza się do dwóch elementów: wydobywania powierzchni płynu oraz jej renderowania. Ten fragment często pochłania najwięcej czasu symulacji i kluczowym jest znalezienie efektywnego rozwiązania. W niniejszej pracy przedstawiona zostało jedno z możliwych rozwiązań tego problemu.
 \par
