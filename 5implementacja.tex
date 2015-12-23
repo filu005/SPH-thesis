@@ -105,7 +105,7 @@ Płyn symulowany metodą SPH można <<formułować>> nadając wartości kilku st
 \subsubsection{Objętość symulowanego płynu oraz masa pojedynczej cząsteczki}
 
 \paragraph{}
-
+Masa pojedynczej cząsteczki wpływa na wielkość sił powstających przy symulacji. Ten parametr jest <<dosyć>> czuły i istotnie wpływa na charakterystykę symulacji jak i jej stabilność. Jego dopasowanie powinno przebiegać równolegle z korektą przede wszystkim kroku czasowego oraz promienia odięcia jądra wygładzającego.
 \par
 
 \subsubsection{Promień odcięcia jądra wygładzającego}
@@ -115,7 +115,7 @@ Promień odcięcia $h$ wyrażany w $[m]$ jest wartością mającą duży wpływ 
 \par Promień odcięcia może być również zbyt mały. W takim wypadku zbyt mała liczba cząstek jest brana pod uwagę przy obliczaniu parametrów i symulacja znowu staje się nienaturalna. Dodatkowo mały promień negatywnie wpływa na stabilność symulacji.
 \par
 \paragraph{}
-Ustawianie tego parametru, spowodowane przez jego duży wpływ na <<charakter>> symulacji, jest trudne. Często sprowadza się do wielokrotnego testowania ustawień tego parametru w parze z innymi, mającymi wpływ na stabilność i wizualną jakość symulacji. <<wyprobowac i moze opisac sposoby kelagera>>
+Ustawianie tego parametru, spowodowane przez jego duży wpływ na charakter symulacji, jest trudne. Często sprowadza się do wielokrotnego testowania ustawień tego parametru w parze z innymi, mającymi wpływ na stabilność i wizualną jakość symulacji. W tej implementacji zdecydowano się na dopasowanie promienia odcięcia do wielkości oczka siatki przechowującej sąsiadów cząstki (patrz rozdział \eqref{subsubsec:neighbour_search}) tak aby te dwie wielkości były jak najbardziej zbliżone. Zostało zbadane, że taki stosunek tych wielkości jest optymalny ze względu na wydajność przeszukiwania sąsiadów <<ref eurographics freiburg 2014>>.
 \par
 
 \subsubsection{Gęstość spoczynkowa}
@@ -124,18 +124,15 @@ Ustawianie tego parametru, spowodowane przez jego duży wpływ na <<charakter>> 
 Równanie \eqref{eqn:sph_desbrun_pressure} wykorzystuje gęstość spoczynkową do obliczenia ciśnienia dla pojedynczej cząsteczki. Mała wartość tego parametru powoduje, że siła ciśnienia pomiędzy cząsteczkami wzajemnie je odpycha. Odpowiednio go korygując powodujemy zmniejszenie się tej siły odpychającej. W pewnym momencie siła osiąga wartości ujemne i cząsteczki zaczynają się przyciągać. Zbyt duża wartość prowadzi do szybkiego wzrostu wartości ciśnienia co powoduje eksplozję numeryczną.
 \par
 
-\paragraph{}
-<<odpowiednie ustawienie>>
-\par
-
 \subsubsection{Lepkość}
 
 \paragraph{}
-Stała występująca w równaniu \eqref{eqn:sph_force_viscosity} na siłę lepkości dostosowywana jest ze względu na pożądany <<charakter>> symulowanego płynu oraz efekt `wygładzający', który zapobiega nagłym wzrostom prędkości cząsteczek i stabilizuje symulację. <<...>>
+Stała występująca w równaniu \eqref{eqn:sph_force_viscosity} na siłę lepkości dostosowywana jest ze względu na pożądany charakter symulowanego płynu oraz efekt `wygładzający', który zapobiega nagłym wzrostom prędkości cząsteczek i stabilizuje symulację.
 \par
 
 \subsubsection{Napięcie powierzchniowe}
 
 \paragraph{}
-<<obecnie chyba blednie zaimplementowane; powoduje artefakty; TODO opis i odpowiednie ustawienie>>
+W równaniu \eqref{eqn:sph_force_surface_tension} występuje stała $\sigma$ modulująca siłę przyciągania do siebie cząstek znajdujących się na powierzchni płynu. Jej większa wartość powoduje zwiększenie się tej siły.
+Wartość progu $l$ funkcjonującego w równaniu \eqref{eqn:sph_force_surface_tension_threshold} ma jedynie ustrzec przed dzieleniem przez bardzo małe wartości. Wartość progu powinna być niska aby zachować naturalność działania siły napięcia powierzchniowego.
 \par

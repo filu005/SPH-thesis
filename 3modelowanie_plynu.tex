@@ -68,6 +68,7 @@ Podobnie jak w przypadku siły ciśnienia, tak przedstawiona siła lepkości jes
 \par
 
 \subsubsection{Napięcie powierzchniowe}
+\label{subsubsec:surface_tension}
 
 \paragraph{}
 %W proponowanym przez <<Muller>> podejściu 
@@ -102,7 +103,7 @@ Aby obliczana siła była aplikowana tylko do cząsteczek znajdujących się na 
 Jak zostało wspomniane powyżej, wartość $\|\boldsymbol{n}\|$ jest mała dla cząstek `wewnątrz' płynu. Dzieląc przez tą wartość w powyższym równaniu wprowadza się potencjalną niestabilność numeryczną. Rozwiązaniem tego problemu jest obliczanie tego rówanania jedynie dla wartości $\|\boldsymbol{n}\|$ przekraczających pewien stały próg $l$:
 \begin{equation}
 \|\boldsymbol{n}_i\| \geq l
-%\label{eqn:}
+\label{eqn:sph_force_surface_tension_threshold}
 \end{equation}
 gdzie $l > 0$.\\
 %wyłuskać
