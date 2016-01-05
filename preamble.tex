@@ -16,6 +16,33 @@
 \usepackage{enumitem}
 \usepackage{hyperref} % Required for adding links and customizing them
 \usepackage[dvipsnames]{xcolor}
+%\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage[boxed, ruled, vlined]{algorithm2e}
+\usepackage[backend=biber, style=alphabetic]{biblatex}
+\usepackage{filecontents}
+
+\SetKwComment{Comment}{$\triangleright$\ }{}
+\SetCommentSty{itshape}
+
+%\ifthenelse{\boolean{algocf@optonelanguage}\AND\equal{\algocf@languagechoosen}{polish}}{%
+%\SetKwInput{KwIn}{Wejście}%
+%\SetKwInput{KwOut}{Wyjście}%
+%\SetKwInput{KwData}{Dane}%
+%\SetKwInput{KwResult}{Rezultat}%
+%\SetKw{KwTo}{Do}%
+%\SetKw{KwRet}{devolver}%
+%\SetKw{Return}{return}%
+%\SetKwBlock{Begin}{inicio}{fin}%
+%\SetKwRepeat{Repeat}{repetir}{hasta que}%
+%
+%\SetKwIF{If}{ElseIf}{Else}{Jeżeli}{entonces}{sin\'o, si}{en otro caso}{end if}
+%\SetKwSwitch{Switch}{Case}{Other}{seleccionar}{hacer}{caso}{sin\'o}{fin caso}{fin seleccionar}
+%\SetKwFor{For}{per}{fai}{fine per}%
+%\SetKwFor{ForPar}{par}{hacer in paralelo}{fin para}%
+%\SetKwFor{ForEach}{dla każdego}{->}{end foreach}
+%\SetKwFor{ForAll}{dla wszystkich}{->}{end forall}
+%\SetKwFor{While}{kiedy}{->}{end while}
+%}{}%
 
 %---------------------------------- kolory hiperlaczy i linkow
 \newcommand\myshade{85}
@@ -58,3 +85,7 @@ breaklines=true,        % sets automatic line breaking
 breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
 escapeinside={\%*}{*)}          % if you want to add a comment within your code
 }
+
+\input{bibliography.tex}
+
+\addbibresource{bibliography.bib}

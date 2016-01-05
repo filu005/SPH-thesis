@@ -4,17 +4,15 @@
 \section{Podsumowanie, wnioski i dalszy rozwój}
 
 \paragraph{}
-
+W tej pracy przedstawiona została metoda symulacji płynów Smoothed Particle Hydrodynamics. Została ona wykorzystana do dyskretyzacji równania Naviera-Stokesa dla mechaniki płynów. W symulacji użyto opisu płynu metodą Lagrange'a wykorzystującego cząsteczki. Przedstawione zostały oddziaływania charakteryzujące mechanikę cieczy: ciśnienie, lepkość, napięcie powierzchniowe.
 \par
-
-\subsection{<<Odpowiedź na założenia>>}
-
-\paragraph{}
-
+Do przyśpieszenia obliczeń wykorzystano mechanizm wyszukiwania sąsiadów bazujący na jednorodnej siatce. Siatka ta dzieli obszar symulacji i jednocześnie wyznacza możliwych sąsiadów poszczególnych cząsteczek. Aby zoptymalizować dostęp do pamięci (zmniejszyć ilość błędnych odniesień do pamięci cache, ang. cache miss), uwzględniono sortowane cząsteczek według krzywej mortona (ang. Z-curve).
 \par
-
-\subsection{<<Plany i pomysły na przyszłość>>}
-
-\paragraph{}
-
+Zaimplementowano sposób wizualizacji symulowanych cząsteczek bazujący na trójwymiarowej mapie odległości (ang. distance field) opisującej kształt powierzchni płynu. Po zbudowaniu mapy przeprowadzany jest na karcie graficznej proces ray castingu.
+\par
+Opisana metoda pozwala na przeprowadzenie symulacji i wizualizacji kilku tysięcy cząstek do użytku w czasie rzeczywistym (dla 4000 cząstek jedna iteracja trwa 160 ms na testowej konfiguracji). Istnieje duże pole do optymalizacji, głównie w zakresie poprawienia lokalności danych. Duży wzrost wydajności - przy odpowiedniej implementacji o rząd wielkości - przyniesie wykorzystanie GPU do przetwarzania symulacji.
+\par
+Zbadano jaki wpływ na stabilność symulacji mają parametry: lepkość i krok czasowy.
+\par
+Porównano jakościowe oraz wydajnościowe wyniki wizualizacji w zależności od gęstości próbkowania płynu na mapie odległości.
 \par

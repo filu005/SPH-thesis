@@ -11,7 +11,7 @@ Metoda SPH zastosowana przy symulacji płynów służy m.in. do dyskretyzacji r�
 \label{subsec:navier_stokes_ss}
 
 \paragraph{}
-Izotermiczny płyn opisuje się przy pomocy 3 parametrów: prędkości $v$, gęstości $\rho$ i ciśnienia $p$. W celu opisu wykorzystać można również dwa podejścia charakteryzujące ośrodek: Eulera i Lagrange'a. W tym pierwszym płyn umieszcza się na siatce i jego parametry są obliczane w poszczególnych komórkach tej siatki. Za pomocą wspomnianych trzech parametrów opisuje się postępowanie płynu w czasie za pomocą dwóch równań. Pierwsze równanie <<opisuje>> zasadę zachowania masy:
+Izotermiczny płyn opisuje się przy pomocy 3 parametrów: prędkości $v$, gęstości $\rho$ i ciśnienia $p$. W celu opisu wykorzystać można również dwa podejścia charakteryzujące ośrodek: Eulera i Lagrange'a. W tym pierwszym płyn umieszcza się na siatce i jego parametry są obliczane w poszczególnych komórkach tej siatki. Za pomocą wspomnianych trzech parametrów opisuje się postępowanie płynu w czasie za pomocą dwóch równań. Pierwsze równanie opisuje zasadę zachowania masy:
 \begin{equation}
 \frac{\partial \boldsymbol{p}}{\partial t} + \nabla \boldsymbol{\cdot} (\rho \boldsymbol{v}) = 0
 \label{eqn:mass_conservation}
@@ -25,7 +25,7 @@ Drugie równanie czyli równanie Naviera-Stokesa opisuje zasadę zachowania pęd
 \label{eqn:navier_stokes}
 \end{equation}
 gdzie $\boldsymbol{F}$ oznacza tzw. siły zewnętrzne oddziałujące na płyn a $\mu$ to współczynnik lepkości dynamicznej płynu. Z tego równania wyprowadzimy wyrażenia na siły lepkości i ciśnienia występujące w symulowanym płynie.\\
-Przy opisie Lagrange'a wykorzystuje się cząsteczki. Każda cząsteczka reprezentuje pewną stałą objętość płynu przypisaną do tej cząsteczki i opisaną wspomnianymi powyżej trzema parametrami. Suma wszystkich cząsteczek w całości definiuje płyn. Takie założenia znacząco ułatwiają równania opisujące płyn. Liczba cząsteczek podczas symulacji jest stała co gwarantuje spełnienie zasady zachowania masy. Rówanie \eqref{eqn:mass_conservation} jest zawsze spełnione. Dodatkowo wyrażenie z lewej strony równania \eqref{eqn:navier_stokes}: $\left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right)$ jest równoważne pochodnej materialnej ${D\boldsymbol{v} \over Dt}$ <<ref wiki Operator Stokesa>>. Z definicji opisu Lagrange'a cząsteczka (tj. układ odniesienia) wobec płynu pozostaje nieruchoma - porusza się razem z tym płynem. Dzięki temu stwierdzeniu wyrażenie upraszcza się do pochodnej ${d\boldsymbol{v} \over dt}$.
+Przy opisie Lagrange'a wykorzystuje się cząsteczki. Każda cząsteczka reprezentuje pewną stałą objętość płynu przypisaną do tej cząsteczki i opisaną wspomnianymi powyżej trzema parametrami. Suma wszystkich cząsteczek w całości definiuje płyn. Takie założenia znacząco ułatwiają równania opisujące płyn. Liczba cząsteczek podczas symulacji jest stała co gwarantuje spełnienie zasady zachowania masy. Rówanie \eqref{eqn:mass_conservation} jest zawsze spełnione. Dodatkowo wyrażenie z lewej strony równania \eqref{eqn:navier_stokes}: $\left( \frac{\partial \boldsymbol{v}}{\partial t} + \left( \boldsymbol{v} \boldsymbol{\cdot} \boldsymbol{\nabla} \right) \boldsymbol{v} \right)$ jest równoważne pochodnej materialnej ${D\boldsymbol{v} \over Dt}$ \cite{wiki:1}. Z definicji opisu Lagrange'a cząsteczka (tj. układ odniesienia) wobec płynu pozostaje nieruchoma - porusza się razem z tym płynem. Dzięki temu stwierdzeniu wyrażenie upraszcza się do pochodnej ${d\boldsymbol{v} \over dt}$.
 \par
 
 \paragraph{}
@@ -44,7 +44,7 @@ Tak obliczone przyspieszenie posłuży nam do znalezienia pozycji i prędkości 
 
 \subsection{Metoda SPH}
 \paragraph{}
-Początkowo metoda SPH została stworzona przez <<ref Lucy>> do symulacji problemów astrofizycznych jednak jest na tyle ogólna, że z powodzeniem znalazła zastosowanie w innych typach modelowań, m.in. w symulacji płynów. Po raz pierwszy SPH do symulacji płynów wykorzystał <<ref Müller>>. Od tamtego czasu ewoluowała w stronę bardziej skomplikowanych algorytmów <<PCISPH>>, <<WCSPH>>, <<wymienić inne SPH>>.\\
+Początkowo metoda SPH została stworzona niezależnie przez R.A. Gingolda i J.J. Monaghana (1977) oraz J.B. Lucy (1977) do symulacji problemów astrofizycznych jednak jest na tyle ogólna, że z powodzeniem znalazła zastosowanie w innych typach modelowań, m.in. w symulacji płynów. Po raz pierwszy SPH do symulacji płynów wykorzystał \cite{muller03}. Od tamtego czasu ewoluowała w stronę bardziej skomplikowanych algorytmów m.in.: WCSPH, PCISPH, IISPH, FLIP.\\
 SPH jest metodą interpolacji w układach, w których używa się opisu Lagrange'a, tj. takich gdzie układ odniesienia porusza się razem z cieczą (każda cząsteczka posiada swój własny układ odniesienia). Przy wykorzystaniu SPH pole, które jest zdefiniowane w konkretnych punktach (w położeniach gdzie znajdują się cząsteczki) może zostać opisane dla dowolnego miejsca w przestrzeni. W tym celu wykorzystuje się następujące rówanie:\\
 
 \begin{samepage}
@@ -71,7 +71,7 @@ Przy wykorzystaniu powyższego równania da się opisać poszczególne składnik
 \par
 
 \paragraph{}
-Istotną właściwością SPH jest łatwość wyliczania pochodnych przestrzennych w postaci gradientu i laplasjanu pola <<skalarnego>>. Gradient pola $A_S(\boldsymbol{r})$ w notacji SPH zapisuje się jako:
+Istotną właściwością SPH jest łatwość wyliczania pochodnych przestrzennych w postaci gradientu i laplasjanu pola skalarnego. Gradient pola $A_S(\boldsymbol{r})$ w notacji SPH zapisuje się jako:
 \begin{equation}
 \nabla A_S(\boldsymbol{r}) = \sum\limits_{j} m_j {A_j \over\rho_j} \nabla W(\boldsymbol{r}-\boldsymbol{r}_j, h)
 \label{eqn:sph_grad}

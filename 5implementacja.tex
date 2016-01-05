@@ -27,18 +27,85 @@ Kod źródłowy aplikacji dostępny jest w publicznym repozytorium kodu pod adre
 \end{figure}
 \newpage
 
-\subsubsection{Pseudokod algorytmu symulacji (?)}
+\subsubsection{Pseudokod algorytmu symulacji}
 
 \paragraph{}
-
+%\begin{figure}[H]
+{
+\setlength{\interspacetitleruled}{0pt}%
+\setlength{\algotitleheightrule}{0pt}%
+%\DecMargin{0.5em}
+\begin{algorithm}[H]
+%\SetAlgorithmName{Algorytm}{} %last arg is the title of listing table
+	stwórz cząsteczki\;
+	wyczyść siatkę sąsiadów\;
+	posortuj cząsteczki według z-indeksów\;
+	umieść cząsteczki na siatce\;
+	\ForAll(\Comment*[f]{obliczenie gęstości}){komórek w siatce}
+	{
+		\ForEach{cząsteczki $i$ w komórce}
+		{
+			\ForEach{sąsiadującej komórki}
+			{
+				\ForEach{cząsteczki $j$ w sąsiadującej komórce}
+				{
+					$\rho_i(\boldsymbol{r}_i) \leftarrow \rho_i(\boldsymbol{r}_i) + m_j W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)$
+				}
+			}
+			$p_i \leftarrow k(({\rho_i \over \rho_0})^{7} - 1)$
+		}
+	
+	}
+	
+	\ForAll(\Comment*[f]{obliczenie sił}){komórek w siatce}
+	{
+		\ForEach{cząsteczki $i$ w komórce}
+		{
+			\ForEach{sąsiadującej komórki}
+			{
+				\ForEach{cząsteczki $j$ w sąsiadującej komórce}
+				{
+					$\boldsymbol{F}_i^{cisn} \xleftarrow{i \neq j} \boldsymbol{F}_i^{cisn} - \rho_j m_j \left( {p_i \over \rho_i^2} + {p_j \over \rho_j^2} \right) \nabla W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)$\\
+					$\boldsymbol{F}_i^{lep} \leftarrow \boldsymbol{F}_i^{lep} + \mu {m_j \over \rho_j} (\boldsymbol{v}_i - \boldsymbol{v}_j) \nabla^2 W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)$\\
+					$\nabla{c}_S(\boldsymbol{r}_i) \leftarrow \nabla{c}_S(\boldsymbol{r}_i) + {m_j \over \rho_j} \nabla W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)$\\
+					$\nabla^2{c}_S(\boldsymbol{r}_i) \leftarrow \nabla^2{c}_S(\boldsymbol{r}_i) + {m_j \over \rho_j} \nabla^2 W(\boldsymbol{r}_i-\boldsymbol{r}_j, h)$
+				}
+			}
+			\If{$\|\nabla{c}_S(\boldsymbol{r}_i)\| \geq l$}
+			{
+				$\boldsymbol{F}_i^{pow} \leftarrow -\sigma \nabla^2{c}_S(\boldsymbol{r}_i) {\nabla{c}_S(\boldsymbol{r}_i) \over \|\nabla{c}_S(\boldsymbol{r}_i)\|}$
+			}
+			$\boldsymbol{F}_i^{total} \leftarrow \boldsymbol{F}_i^{cisn} + \boldsymbol{F}_i^{lep} + \boldsymbol{F}_i^{pow} + \boldsymbol{F}_i^{zew}$\\
+			$a_i \leftarrow {\boldsymbol{F}_i^{total} \over g}$
+		}
+	
+	}
+	
+	\ForEach(\Comment*[f]{obsługa kolizji}){cząsteczka}
+	{
+		\ForEach{ścianka naczynia}
+		{
+			oblicz dystans $d$ cząsteczki do ścianki\;
+			\If{$d$ > promień jądra wygładzającego $h$}
+			{
+				odepchnij cząsteczkę\;
+			}
+		}
+	}
+	
+	\ForEach(\Comment*[f]{całkowanie}){cząsteczka i}
+	{
+		$\boldsymbol{x}_i(t+\Delta t) \leftarrow \boldsymbol{x}_i(t) + \boldsymbol{v}_i(t)\Delta t + {1 \over 2}\boldsymbol{a}_i(t){\Delta t}^2$\\
+		$\boldsymbol{v}_i(t+\Delta t) \leftarrow {1 \over \Delta t}(\boldsymbol{x}_i(t+\Delta t) - \boldsymbol{x}_i(t))$
+	}
+\end{algorithm}
+%\IncMargin{0.5em}
+}
+%\caption{Symulacja}
+%\end{figure}
 \par
 
-\subsubsection{Złożoność obliczeniowa (?)}
-
-\paragraph{}
-
-\par
-
+%\subsubsection{Złożoność obliczeniowa (?)}
 
 \subsection{Optymalizacje}
 
@@ -48,15 +115,19 @@ Wydajność aplikacji poprawiać można na wiele sposobów. Najwięcej czasu poc
 
 \subsubsection{Wyszukiwnie sąsiadów}
 \label{subsubsec:neighbour_search}
-<<uniform grid - jednorodna siatka>>
+
 \paragraph{}
-Obliczając parametr symulacji dla każdej cząsteczki przy użyciu SPH iteruje się po wszystkich pozostałych cząsteczkach. Jako, że dla każdej cząsteczki musimy poznać jej parametry, złożoność iteracyjna dla $n$ cząsteczek jest <<ograniczona przez>> $O(n^2)$. Chcąc symulować płyn opisany liczbą cząsteczek rzędu 10'000 w czasie rzeczywistym, taka złożoność obliczeniowa jest niesatysfakcjonująca. Aby <<zredukować>> złożoność obliczeniową stosuje się metody wyszukiwania sąsiadów.
-\par
-Wykorzystywane w symulacji jądra wygładzające posiadają tzw. promień odcięcia, który ogranicza zasięg jaki jest brany pod uwagę przy obliczaniu parametrów pojedynczej cząstki. Wiedząc, że cząstka wykorzystuje jedynie małą część innych cząstek do wyliczenia swoich parametrów, można znacznie skrócić czas obliczeń. W takim wypadku asymptotyczna złożoność obliczeniowa redukowana jest z $O(n^2)$ do $O(mn)$, gdzie $m$ oznacza średnią liczbę sąsiadów cząstki. Ta liczba często nie przekracza wartości 30-40.
+Stworzona na potrzeby tej pracy implementacja struktury do optymalizacji poszukiwań sąsiednich cząteczek, wraz ze sposobem ich sortowania, została opisana w \cite{ihmsen13}.
 \par
 
 \paragraph{}
-Jednym z typów struktur, które pozwalają poszeregować cząsteczki na grupy sąsiadów jest jednorodna siatka (ang. uniform grid). Cały obszar, w którym znajdują się cząsteczki - i mogą się znaleźć podczas przebiegu symulacji - dzielony jest na komórki. Obszar ten nie zmienia się przez cały czas trwania symulacji więc istotne jest aby cząsteczki nie miały szansy z niego `uciec'. W przeciwnym wypadku algorytm nie będzie w stanie poprawnie znaleźć sąsiadów dla `uciekinierów'. Przy obliczaniu parametrów cząsteczek znajdujących się w komórce $X$ iteruje się tylko po tych cząsteczkach, które znajdują się w 26 komórkach <<ref: (tj. w promieniu jednej komórki; za wyjątkiem komórek znajdujących się na skraju obszaru)>> sąsiadujących z komórką $X$. Rozmiar komórek również jest stały i jest równy najbliższej potędze dwójki większej od promienia odcięcia jądra wygładzającego. Przyjęcie takiego rozmiaru komórki zapewnia, że sąsiadujące komórki zawierają wszystkie cząsteczki wymagane do przeprowadzenia poprawnych obliczeń.
+Obliczając parametr symulacji dla każdej cząsteczki przy użyciu SPH iteruje się po wszystkich pozostałych cząsteczkach. Jako, że dla każdej cząsteczki musimy poznać jej parametry, złożoność obliczeniowa iteracji dla $n$ cząsteczek wynosi $O(n^2)$. Chcąc symulować płyn opisany liczbą cząsteczek rzędu 10'000 w czasie rzeczywistym, taka złożoność obliczeniowa jest niesatysfakcjonująca. Aby zredukować złożoność obliczeniową stosuje się metody wyszukiwania sąsiadów.
+\par
+Wykorzystywane w symulacji jądra wygładzające posiadają tzw. promień odcięcia, który ogranicza zasięg w jakim poszukiwani są sąsiedzi brani pod uwagę przy obliczaniu parametrów pojedynczej cząstki. Wiedząc, że cząstka wykorzystuje jedynie małą część ze wszystkich cząstek do wyliczenia swoich parametrów, można znacznie skrócić czas obliczeń poprzez zacieśnienie zakresu poszukiwań sąsiadów. W takim wypadku asymptotyczna złożoność obliczeniowa redukowana jest z $O(n^2)$ do $O(mn)$, gdzie $m$ oznacza średnią liczbę sąsiadów cząstki. Ta liczba często nie przekracza wartości 30-40.
+\par
+
+\paragraph{}
+Jednym z typów struktur, które pozwalają poszeregować cząsteczki na grupy sąsiadów jest jednorodna siatka (ang. uniform grid). Cały obszar, w którym znajdują się cząsteczki - i mogą się znaleźć podczas przebiegu symulacji - dzielony jest na komórki. Obszar ten nie zmienia się przez cały czas trwania symulacji więc istotne jest aby cząsteczki nie miały szansy z niego `uciec'. W przeciwnym wypadku algorytm nie będzie w stanie poprawnie znaleźć sąsiadów dla `uciekinierów'. Przy obliczaniu parametrów cząsteczek znajdujących się w komórce $X$ iteruje się tylko po tych cząsteczkach, które znajdują się w 26 komórkach sąsiadujących z komórką $X$. Rozmiar komórek również jest stały i jest równy najbliższej potędze dwójki większej od promienia odcięcia jądra wygładzającego. Przyjęcie takiego rozmiaru komórki zapewnia, że sąsiadujące komórki zawierają wszystkie cząsteczki wymagane do przeprowadzenia poprawnych obliczeń.
 \par
 Każdej komórce może zostać przypisany indeks, który oblicza się \textbf{dla cząsteczki} według poniższego wzoru, na podstawie jej położenia:
 
@@ -64,13 +135,12 @@ Każdej komórce może zostać przypisany indeks, który oblicza się \textbf{dl
 c_{idx} = k + l * K + m * K * L
 \label{eqn:get_cell_index}
 \end{equation}
-gdzie $K$ i $L$ to rozmiary obszaru symulacji w kierunkach $x$ i $y$ <<uwaga, że K i L to potęgi dwójki aby nie wprowadzać niedokładności związanych z zaokrągleniami przy dzieleniu>>, a $[k, l, m]$ to położenie komórki w globalnym układzie współrzędnych. <<Implementacja funkcji w dodatku/listingu xxx>>.
+gdzie $K$ i $L$ to rozmiary obszaru symulacji w kierunkach $x$ i $y$, a $[k, l, m]$ to położenie komórki w globalnym układzie współrzędnych. Wartości $K$, $L$ i $M$ (rozmiar obszaru symulacji w kierunku $z$), aby zapobiec wprowadzaniu niedokładności związanych z zaokrągleniami liczb przy dzieleniu, są ustawiane jako wielokrotności liczby 2. <<Implementacja funkcji w dodatku/listingu xxx>>.
 
 \paragraph{}
-Aby zachować optymalne ułożenie danych w pamięci podręcznej, tablica przechowująca cząsteczki jest sortowana ze względu na indeks komórek w której znajdują się cząsteczki - czyli pośrednio ze względu na ich położenie w obszarze symulacji. Dzięki temu cząsteczki znajdujące się w jednej komórce ułożone są blisko siebie również w pamięci. Nie oznacza to jednak, że cząsteczki z sąsiadujących komórek - które również biorą udział w obliczeniach - będą znajdywały się również niedaleko w pamięci. Aby zwiększyć wykorzystanie danych znajdujących się w pamięci podręcznej (ang. cache-hit) wykorzystywana jest Krzywa Hilberta/Krzywa-Z (ang. Hilbert space filling curve/Z-Curve) <<ref Hilbert curve>>. Indeksowanie komórek i sortowanie cząsteczek według tej krzywej pozwala na ułożenie cząsteczek znajdujących się w sąsiadujących komórkach bliżej siebie w pamięci. <<pomiary, grafika z z-curve>>
+Aby zachować optymalne ułożenie danych w pamięci podręcznej, tablica przechowująca cząsteczki jest sortowana ze względu na indeks komórek w której znajdują się cząsteczki - czyli pośrednio ze względu na ich położenie w obszarze symulacji. Dzięki temu cząsteczki znajdujące się w jednej komórce ułożone są blisko siebie również w pamięci. Nie oznacza to jednak, że cząsteczki z sąsiadujących komórek - które również biorą udział w obliczeniach - będą znajdywały się również niedaleko w pamięci. Aby zwiększyć wykorzystanie danych znajdujących się w pamięci podręcznej (ang. cache-hit) wykorzystywane jest kodowanie Mortona/Krzywa-Z (ang. Morton code/Z-Curve) \cite{wiki:3}. Indeksowanie komórek i sortowanie cząsteczek według tej krzywej pozwala na ułożenie cząsteczek znajdujących się w sąsiadujących komórkach bliżej siebie w pamięci.
 \par
-Posortowanie cząsteczek pozwala również na uproszczenie struktury komórki, która przy takich założeniach przechowuje jedynie \textbf{adres pierwszej cząsteczki} w posortowanej tablicy i \textbf{liczbę cząsteczek} znajdujących się w danej komórce. <<graficzna reprezentacja siatki, listing xxx>>
-%układ, rozkład, schemat, podział, organizacja, powiązanie, ulozenie
+Posortowanie cząsteczek pozwala również na uproszczenie struktury komórki, która przy takich założeniach przechowuje jedynie \textbf{adres pierwszej cząsteczki} w posortowanej tablicy i \textbf{liczbę cząsteczek} znajdujących się w danej komórce.
 \par
 
 \paragraph{}
@@ -111,11 +181,12 @@ Masa pojedynczej cząsteczki wpływa na wielkość sił powstających przy symul
 \subsubsection{Promień odcięcia jądra wygładzającego}
 
 \paragraph{}
-Promień odcięcia $h$ wyrażany w $[m]$ jest wartością mającą duży wpływ na stabilność i wydajność symulacji oraz jakość odwzorowania płynu. Określa on <<`zasięg widzenia'>> pojednczej cząsteczki, w którym to szuka swoich sąsiadów - cząsteczek wykorzystywanych do obliczeń parametrów tej cząsteczki. Im więcej sąsiadów, tym zoptymalizowany algorytm ich przeszukiwania \eqref{subsubsec:neighbour_search} osiąga gorszą złóżoność, która z powrotem dąży do $O(n^2)$. Mylnym jest pojęcie o zwiększaniu dokładności symulacji wraz ze zwiększeniem promienia odcięcia. Od pewnego momentu zwiększanie tego parametru powoduje nienaturalne zachowanie się płynu. Siła ciśnienia, która jest odpowiedzialna za utrzymywanie odpowiednich odlegości pomiędzy cząsteczkami staje się zbyt duża i cząsteczki zlepiaja się w kulę lub torusa <<foto>>.
-\par Promień odcięcia może być również zbyt mały. W takim wypadku zbyt mała liczba cząstek jest brana pod uwagę przy obliczaniu parametrów i symulacja znowu staje się nienaturalna. Dodatkowo mały promień negatywnie wpływa na stabilność symulacji.
+Promień odcięcia $h$ jest wartością mającą duży wpływ na stabilność i wydajność symulacji oraz jakość odwzorowania płynu. Określa on `zasięg widzenia' pojednczej cząsteczki, w którym to szuka swoich sąsiadów - cząsteczek wykorzystywanych do obliczeń parametrów tej cząsteczki. Im więcej sąsiadów, tym zoptymalizowany algorytm ich przeszukiwania \eqref{subsubsec:neighbour_search} osiąga gorszą złóżoność, która z powrotem dąży do $O(n^2)$. Mylnym jest pojęcie o zwiększaniu dokładności symulacji wraz ze zwiększeniem promienia odcięcia. Od pewnego momentu zwiększanie tego parametru powoduje nienaturalne zachowanie się płynu. Siła ciśnienia, która jest odpowiedzialna za utrzymywanie odpowiednich odlegości pomiędzy cząsteczkami staje się zbyt duża i cząsteczki zlepiaja się nienaturalnie.
+\par
+Promień odcięcia może być również zbyt mały. W takim wypadku zbyt mała liczba cząstek jest brana pod uwagę przy obliczaniu parametrów i symulacja znowu staje się nienaturalna. Dodatkowo mały promień negatywnie wpływa na stabilność symulacji.
 \par
 \paragraph{}
-Ustawianie tego parametru, spowodowane przez jego duży wpływ na charakter symulacji, jest trudne. Często sprowadza się do wielokrotnego testowania ustawień tego parametru w parze z innymi, mającymi wpływ na stabilność i wizualną jakość symulacji. W tej implementacji zdecydowano się na dopasowanie promienia odcięcia do wielkości oczka siatki przechowującej sąsiadów cząstki (patrz rozdział \eqref{subsubsec:neighbour_search}) tak aby te dwie wielkości były jak najbardziej zbliżone. Zostało zbadane, że taki stosunek tych wielkości jest optymalny ze względu na wydajność przeszukiwania sąsiadów <<ref eurographics freiburg 2014>>.
+Ustawianie tego parametru, spowodowane przez jego duży wpływ na charakter symulacji, jest trudne. Często sprowadza się do wielokrotnego testowania ustawień tego parametru w parze z innymi, mającymi wpływ na stabilność i wizualną jakość symulacji. W tej implementacji zdecydowano się na dopasowanie promienia odcięcia do wielkości oczka siatki przechowującej sąsiadów cząstki (patrz rozdział \eqref{subsubsec:neighbour_search}) tak aby te dwie wielkości były jak najbardziej zbliżone. Zostało zbadane, że taki stosunek tych wielkości jest optymalny ze względu na wydajność przeszukiwania sąsiadów \cite{teschner14}.
 \par
 
 \subsubsection{Gęstość spoczynkowa}
@@ -134,5 +205,5 @@ Stała występująca w równaniu \eqref{eqn:sph_force_viscosity} na siłę lepko
 
 \paragraph{}
 W równaniu \eqref{eqn:sph_force_surface_tension} występuje stała $\sigma$ modulująca siłę przyciągania do siebie cząstek znajdujących się na powierzchni płynu. Jej większa wartość powoduje zwiększenie się tej siły.
-Wartość progu $l$ funkcjonującego w równaniu \eqref{eqn:sph_force_surface_tension_threshold} ma jedynie ustrzec przed dzieleniem przez bardzo małe wartości. Wartość progu powinna być niska aby zachować naturalność działania siły napięcia powierzchniowego.
+Wartość progu $l$ funkcjonującego w równaniu \eqref{eqn:sph_force_surface_tension_threshold} ma jedynie ustrzec przed dzieleniem przez bardzo małe wartości co negatywnie wpływa na stabilność symulacji. Wartość progu powinna być niska aby zachować naturalność działania siły napięcia powierzchniowego.
 \par

@@ -4,10 +4,8 @@
 \section{Wizualizacja płynu}
 
 \paragraph{}
-Wizualizacja płynu opiera się na metodzie opisanej w pracy <<Goswami>>. W tym podejściu powierzchnia płynu reprezentowana jest przez pole wokseli. Każdy woksel zawiera dystans do najbliższej powierzchni. W ten sposób reprezentuje tzw. mapę odległości (ang. distance field). <<foto jakiegos DF w 2d>>
+Wizualizacja płynu opiera się na metodzie opisanej w pracy \cite{goswami10}. W tym podejściu powierzchnia płynu reprezentowana jest przez pole wokseli. Każdy woksel zawiera dystans do najbliższej powierzchni. W ten sposób reprezentuje tzw. mapę odległości (ang. distance field). <<foto DF w 2d>>
 Głównymi elementami opisywanej metody wizualizacji są: znalezienie cząsteczek na powierzchni płynu, konstrukcja mapy odległości oraz przeprowadzenie raycastingu.
-\par
-<<coś o MC z distance field>>
 \par
 
 \subsection{Znalezienie cząsteczek powierzchniowych}
@@ -15,7 +13,7 @@ Głównymi elementami opisywanej metody wizualizacji są: znalezienie cząstecze
 \paragraph{}
 Cząsteczki, które nie leżą na powierzchni płynu nie są potrzebne do jego wizualizacji i mogą zostać pominięte. Znacznie zmniejsza to koszt generacji mapy odległości za czym idzie przyśpieszenie procesu wizualizacji.
 \par
-Znalezienie cząsteczek leżacych na powierzchni można przeprowadzić różnymi metodami. Jedna z nich wykorzystuje gradient pola kolorowego (ang. color field) wykorzystywane przy obliczaniu napięcia powierzchniowego płynu. Kolejna opiera się na obliczaniu odległości danej cząsteczki do punktu środka masy (ang. center of mass). Poniżej zostały opisane obie wymienione metody.
+Znalezienie cząsteczek leżacych na powierzchni można przeprowadzić różnymi metodami. Jedna z nich wykorzystuje gradient pola kolorowego (ang. color field) wykorzystywane przy obliczaniu napięcia powierzchniowego płynu \cite{kelager06}. Kolejna opiera się na obliczaniu odległości danej cząsteczki do punktu środka masy (ang. center of mass). Poniżej zostały opisane obie wymienione metody.
 
 \subsubsection{Metoda odległości do punktu środka masy}
 
@@ -25,7 +23,7 @@ Cząsteczka $i$ jest zaliczana do cząsteczek powierzchniowych jeżeli jej dysta
 \boldsymbol{r}_{CM_{i}} = {{\sum\limits_{j} {m_j \boldsymbol{r}_{j}}} \over {\sum\limits_{j} {m_j}}}
 \label{eqn:center_mass}
 \end{equation}
-Okazuje się jednak, że powyższy warunek jest niewystarczający w miejscach gdzie występuje niewiele cząsteczek. Dodatkowym <<warunkeim>> jest automatyczne zaliczenie cząsteczki do powierzchniowych gdy liczba cząsteczek w jej sąsiedztwie jest poniżej pewnego progu.
+Okazuje się jednak, że powyższy warunek jest niewystarczający w miejscach gdzie występuje niewiele cząsteczek. Dodatkowym warunkiem jest automatyczne zaliczenie cząsteczki do powierzchniowych gdy liczba cząsteczek w jej sąsiedztwie jest poniżej pewnego progu.
 \par
 Jeżeli cząsteczka spełnia powyższe warunki, wpisywana jest do odpowiedniej tablicy. W przeciwnym wypadku jest po prostu pomijana.
 \par
@@ -45,25 +43,23 @@ Gradient pola kolorowego obliczany jest już przy modelowaniu siły napięcia po
 \paragraph{}
 Mapa odległości zbudowana jest z jednorodnej trójwymiarowej siatki wokseli. Gęstość tej siatki ma istatne znaczenie dla wydajności jak i jakości odwzorowania płynu. Siatka o większej ilości wokseli pozwala na zachowanie większej ilości szczegółów ale wymaga więcej czasu na zbudowanie - czas ten rośnie w tempie $O(n^3)$. Wpływ na szybkość konstrukcji mapy ma również ilość cząsteczek powierzchniowych.
 \par
-Podejście proponowane przez <<Goswami>> wygląda następująco: siatka wokseli inicjowana jest wartością maksymalną $r_{max}$ <<$r_{min}< r < r_{max}$?>>. Dana cząsteczka $i$ otaczana jest sześcianem o boku długości $r$. Dla kadego woksela znajdującego się wewnątrz tego sześcianu obliczany jest dystans $d$ do cząsteczki $i$. Wartość woksela określana jest według następującego wzoru:
+Podejście proponowane przez \cite{goswami10} wygląda następująco: siatka wokseli inicjowana jest wartością maksymalną $r_{max}$. Dana cząsteczka $i$ otaczana jest sześcianem o boku długości $r$. Dla kadego woksela znajdującego się wewnątrz tego sześcianu obliczany jest dystans $d$ do cząsteczki $i$. Wartość woksela określana jest według następującego wzoru:
 \begin{equation}
 d_v = min(d, d_v^{old})
 \label{eqn:distance_field}
 \end{equation}
-Jeśli $d$ jest mniejsze niż $r_{min}$, to wokselowi zostaje przypisana wartość $r_{min}$. <<teoretycznie $r_{max} = r\sqrt{3}$, $r_{min} = c::xyzminV$>>
-\par
-<<voxel-based, szacowanie dystansu do powierzchni w obrębie sąsiedztwa>>
+Jeśli $d$ jest mniejsze niż $r_{min}$, to wokselowi zostaje przypisana wartość $r_{min}$.
 \par
 
 
 \subsection{Renderowanie - GPU raycasting}
 
 \paragraph{}
-W ostatnim kroku wizualizacji płynu dane zawarte w mapie odległości (przechowywanej w pamięci karty graficznej jako tekstura 3D) poddawane są procesowi raycastingu. Raycasting polega na przeprowadzeniu promienia przez renderowany obszar dla każdego fragmentu (piksela) obrazu; Dla każdego piksela wykonywany jest mały program - fragment shader - który inicjuje promień zberający krok po kroku próbki z danej objętości. Początek i koniec promienia muszą być znane przed uruchomieniem shadera. Dane te uzyskuje się poprzez uprzednie stworzenie bryły ograniczającej objętość renderowanego płynu. W najprostrzym przypadku bryłą tą jest prostopadłościan. Bryłę tą poddaje się procesowi rasteryzacji (w dwóch przejściach [ang. rendering pass] renderując raz przednie a raz tylne ściany) do dwóch tekstur. Obliczając różnicę kolorów pomiędzy tymi dwoma teksturami można uzyskać kierunek promienia dla każdego piksela ograniczonego tą bryłą.
+W ostatnim kroku wizualizacji płynu dane zawarte w mapie odległości (przechowywanej w pamięci karty graficznej jako tekstura 3D) poddawane są procesowi raycastingu \cite{hadwiger05}. Raycasting polega na przeprowadzeniu promienia przez renderowany obszar dla każdego fragmentu (piksela) obrazu; Dla każdego piksela wykonywany jest mały program - fragment shader - który inicjuje promień zberający krok po kroku próbki z danej objętości. Początek i koniec promienia muszą być znane przed uruchomieniem shadera. Dane te uzyskuje się poprzez uprzednie stworzenie bryły ograniczającej objętość renderowanego płynu. W najprostrzym przypadku bryłą tą jest prostopadłościan. Bryłę tą poddaje się procesowi rasteryzacji (w dwóch przejściach [ang. rendering pass] renderując raz przednią a raz tylną ścianę) do dwóch tekstur. Obliczając różnicę kolorów pomiędzy tymi dwoma teksturami można uzyskać kierunek promienia dla każdego piksela ograniczonego tą bryłą.
 \par
 <<foto bryła>>
 \par
-Poprzez konstrukcję bryły lepiej dopasowanej do objętości płynu można uniknąć wysyłania dużej części promieni, które nigdy nie przetną tej objętości. Istotnie zwiększa to wydajność raycastingu. Technika ta została opisana w <<link>>.
+Poprzez konstrukcję bryły lepiej dopasowanej do objętości płynu można uniknąć wysyłania dużej części promieni, które nigdy nie przetną tej objętości. Istotnie zwiększa to wydajność raycastingu. Technika ta została opisana w \cite{@haferburg}.
 \par
 Częstotliwość próbkowania mapy odległości wzdłuż promienia ma wpływ na prędkość procesu raycastingu jak i na jakość uzyskiwanego obrazu.
 \par
