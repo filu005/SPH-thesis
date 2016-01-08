@@ -13,6 +13,7 @@
 \usepackage{textcomp}
 \usepackage{physics}
 \usepackage{mathtools}  % loads »amsmath«
+\usepackage{amsfonts}
 \usepackage{enumitem}
 \usepackage{hyperref} % Required for adding links and customizing them
 \usepackage[dvipsnames]{xcolor}
@@ -20,6 +21,10 @@
 \usepackage[boxed, ruled, vlined]{algorithm2e}
 \usepackage[backend=biber, style=alphabetic]{biblatex}
 \usepackage{filecontents}
+\usepackage{import}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage[section]{placeins}
 
 \SetKwComment{Comment}{$\triangleright$\ }{}
 \SetCommentSty{itshape}
@@ -59,7 +64,7 @@
 }
 %----------------------------------
 
-\graphicspath{ {./diagram/} }
+\graphicspath{ {./plots/} {./diagram/} {./graphics/} }
 
 \lstset{inputpath=code}
 

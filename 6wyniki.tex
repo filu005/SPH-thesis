@@ -4,23 +4,248 @@
 \section{Wyniki}
 
 \paragraph{}
+Ten rozdział przedstawia wyniki symulacji. Zamieszczone zostały przykładowe ujęcia z przebiegu symulacji. Zbadana została stabilność symulacji w zależności od parametrów parametrów: krok czasowy, lepkość, sprężystość ścianek naczynia. Przeprowadzono również analizę wydajności symulacji: policzona została obliczana liczba klatek na sekundę w zależności od liczby cząstek oraz rozdzielczości siatki przeszukiwania sąsiadów.
+
+\par
+Symulacja została przeprowadzona w ustawieniu popularnie nazywanym \textit{dam break}: wszystkie cząsteczki zgrupowane zostały w bloku po jednej części zbiornika; sam zbiornik ma kształt prostopadłościanu o proporcjach $1\cross1\cross0.5$. Parametry symulacji zostały ustalone na następujące (chyba, że podano inaczej): liczba cząstek: $8000$, rozdzielczość siatki przeszukiwania sąsiadów: $32\cross32\cross16$, promień jądra wygładzającego $h$: $0.03125$, masa cząstki $m$: $0.0008$, gęstość spoczynkowa $\rho_0$: $115$, stała gazowa $k$ (powiązana z tzw. sztywnością gazu): $4.5$, stała siły lepkości $\mu$: $1.5$, stała siły napięcia powierzchniowego: $0.45$, próg wielkości gradientu pola kolorowego $l$ (dla siły napięcia powierzchniowego): $0.00001$, sprężystość (sztywność) ścian naczynia: $50000$.
+\par
+Testy wydajności zostały przeprowadzone na komputerze o konfiguracji sprzętowej: AMD Phenom II X4 3.25 GHz, Nvidia GeForce GTX 660 Ti, 8 Gb RAM.
+\par
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{front_sim}
+\caption{Ujęcie z symulacji 16000 cząsteczek. Kolor cząsteczek oznacza numer indeksu oczka siatki do której należą i jednocześnie rozmieszczenie w pamięci}
+\label{fig:ss_front_sim}
+\end{figure}
 
 \par
 
-\subsection{Prezentacja symulacji <<foto>>}
-
+\subsection{Prezentacja symulacji}
+ 
 \paragraph{}
+\begin{figure}[H]
+\centering     %%% not \center
+
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image01}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image02}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image03}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image04}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image05}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image06}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image07}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image08}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k/png/image09}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+
+\caption{Ujęcia symulacji w odstępach czasowych około 0.3}
+\label{fig:ss_8k}
+\end{figure}
 
 \par
+Seria ujęć \eqref{fig:ss_8k} przedstawia przykładowy przebieg symulacji płynu. Kolor cząsteczek zależy od ich położenia na siatce wyszukiwania sąsiadów, a jednocześnie świadczą o ułożeniu w pamięci.
+
+\begin{figure}[H]
+\centering     %%% not \center
+
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image01}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image02}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image03}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image04}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image05}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image06}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image07}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image08}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.3\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_64/image09}%width=0.9\linewidth, keepaspectratio
+\end{subfigure}
+
+\caption{Ujęcia wizualizacji symulacji w odstępach czasowych równych około 0.3. Siatka wokseli jest rozdzielczości $64^3$}
+\label{fig:ss_8k_vis_64}
+\end{figure}
+
+\par
+Seria ujęć \eqref{fig:ss_8k_vis_64} odpowiada wizualizacji przebiegu symulacji pokazanej na \eqref{fig:ss_8k}, przy wykorzystaniu siatki wokseli o rozdzielczości $64^3$. Na ujęciach została wykorzystana technika mapowanie kubicznego (ang. cube mapping), która ma za zadanie symulować załamania promieni światła przechodzących przez objętość płynu.
+
+\begin{figure}[H]
+\centering     %%% not \center
+
+\begin{subfigure}[b]{0.80\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_comp/image32}%width=0.9\linewidth, keepaspectratio
+\caption{Rozdzielczość siatki wokseli: $32\cross32\cross32$}
+\label{subfig:ss_8k_comp_32}
+\end{subfigure}
+%~
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.80\textwidth}
+\includegraphics[width=\textwidth]{8k_vis_comp/image64}%width=0.9\linewidth, keepaspectratio
+\caption{Rozdzielczość siatki wokseli: $64\cross64\cross64$}
+\label{subfig:ss_8k_comp_64}
+\end{subfigure}
+
+\caption{Porównanie jakości wizualizacji dla różnych rozdzielczości siatek wokseli: $32^3$ i $64^3$}
+\label{fig:ss_8k_comp_32_64}
+\end{figure}
+
+\par
+Ujęcia \eqref{fig:ss_8k_comp_32_64} przedstawiają tę samą chwilę czasową. Wizualizacja została przeprowadzona jednak z różną dokładnością próbkowania płynu na mapie odległości. Ujęcie \eqref{subfig:ss_8k_comp_64} prezentuje więcej szczegółów, załamania promieni przez powierzchnię płynu wydają się być bardziej naturalne (spowodowane jest to zwiększoną dokładnością obliczenia wektorów normalnych powierzchni).
+\par
+
+\begin{figure}[H]
+\centering     %%% not \center
+
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{8k_viscosity_comp/viscosity01}
+\caption{Stała lepkości $\mu=1.5$}
+\label{subfig:ss_8k_comp_viscosity_15_1}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{8k_viscosity_comp/viscosity01_5}
+\caption{Stała lepkości $\mu=5.0$}
+\label{subfig:ss_8k_comp_viscosity_50_1}
+\end{subfigure}
+\\
+\vspace{1em}
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{8k_viscosity_comp/viscosity02}
+\caption{Stała lepkości $\mu=1.5$}
+\label{subfig:ss_8k_comp_viscosity_15_2}
+\end{subfigure}
+~
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{8k_viscosity_comp/viscosity02_5}
+\caption{Stała lepkości $\mu=5.0$}
+\label{subfig:ss_8k_comp_viscosity_50_2}
+\end{subfigure}
+
+\caption{Porównanie przebiegu symulacji dla róznych wartości stałej lepkości $\mu$: $1.5$ i $5.0$}
+\label{fig:ss_8k_comp_viscosity}
+\end{figure}
+
+\par
+Ujęcia \eqref{fig:ss_8k_comp_viscosity} pokazują wizualne różnice w symulacji przy różnych wartościach stałej lepkości. Można zauważyć, że zachowanie płynu przy mniejszej lepkości jest bardziej gwałtowne, burzliwe. Dla płynu o większej lepkości prędkość cząsteczek jest tracona przez wewnętrzne tarcie. Ten efekt dodatkowo można zaobserwować na wykresie \eqref{fig:plot_viscosity}.
 
 \subsection{Analiza wydajności}
+\label{subsec:perf_anal}
 
 \paragraph{}
+Poniżej przedstawione zostały wyniki wydajności stworzonej aplikacji. Celem tego akapitu, oprócz podbudowania ego autora wysokimi słupkami wydajności widocznymi na wykresach, jest wskazanie progu ilości cząsteczek aby symulację wciąż można było uznać za interaktywną (czyli taką, w której ze swobodą można manipulować aplikacją w czasie rzeczywistym). Z drugiej strony, granicą płynności animacji (która jest subiektywna i przedstawiona tutaj wartość wynika z własnych doświadczeń autora z aplikacją) jest około 12-15 klatkek na sekundę.
+\par
+
+\begin{figure}[H]
+\input{plots/fps_grid_res}
+\caption{Wykres wydajności wyrażonej w klatkach na sekundę w zależności od rozdzielczości siatki przeszukiwania sąsiadów. Przedstawione wartości są wynikiem symulowania $2000$ cząsteczek. Uwaga - ostatni słupek pokazuje przekłamane wartości (wyjaśnienie poniżej)}
+\label{fig:plot_grid_resolution_perf}
+\end{figure}
 
 \par
+Wykres \eqref{fig:plot_grid_resolution_perf} obrazuje skuteczność zaproponowanego algorytmu wyszukiwania sąsiadów. Wydajność zoptymalizowanej symulacji (przedostatni słupek $32\cross32\cross16$) w porównaniu do symulacji bez optymalizacji (pierwszy słupek $1\cross1\cross1$) wzrosta około 5-krotnie.
+\par
+Trzeba zaznaczyć, że przyrost wydajności na ostatnim słupku nie jest w pełni prawdziwy. Wynika to z dwóch rzeczy.
+\par
+Przy przeprowadzaniu testów ustawienia sterowników karty graficznej wymuszały tzw. synchronizację pionową. Funkcja ta ma wyeliminować błędy wyświetlania obrazu charakterystyczne dla monitorów LCD (przede wszystkim tzw. rozrywanie obrazu [ang. screen tearing]). Włączenie tego mechanizmu powoduje jednak ogranicznie liczby wyświetlanych klatek do częstotliwości odświeżania monitora, która w wypadku konfiguracji testowej wynosiła 60 Hz.
+\par
+Drugim powodem przekłamania na wykresie jest zbyt duża rozdzielczość siatki. W tym ostatnim przypadku pojedyncze oczko siatki ma rozmiary mniejsze niż promień jądra wygładzającego i z tego powodu cząsteczki nie znajdują wszystkich swoich sąsiadów. W rezultacie siły są błędnie obliczane i zachowanie płynu odbiega od spodziewanego.
+
+\begin{figure}[H]
+\input{plots/fps_n}
+\caption{Wykres wydajności wyrażonej w klatkach na sekundę w zależności od liczby cząsteczek biorących udział w symulacji}
+\label{fig:plot_particles_perf}
+\end{figure}
+
+\par
+Wykres \eqref{fig:plot_particles_perf} obrazuje wpływ ilości symulowanych cząsteczek na wydajność. Na jego podstawie można ocenić, że interaktywność symulacji zachowana jest dla ok. $6000$ cząsteczek.
+
+\begin{figure}[H]
+\centering
+\input{plots/fps_n_d}
+\caption{Wykres wydajności symulacji i wizualizacji wyrażonej w klatkach na sekundę w zależności od liczby cząsteczek biorących udział w symulacji oraz od rodzielczości użytej siatki wokseli (siatki $32^3$ i $64^3$)}
+\label{fig:plot_particles_vis_perf}
+\end{figure}
+
+\par
+Wykres \eqref{fig:plot_particles_vis_perf} pokazuje z jaką wydajnością przeprowadzana jest symulacja płynu wraz z jego wizualizacją. W tym wypadku interaktywność symulacji, dla siatki wokseli $32\cross32\cross32$, zachowana jest już dla mniej niż $4000$ cząsteczek. Niestety w przypadku użycia siatki wokseli o większej rozdzielczości ($64^3$) płynność animacji znacząco spada i nawet dla $2000$ cząsteczek nie jest możliwe uzyskanie zadowalającej wydajności.
+\par
+Porównując ten wykres do wykresu \eqref{fig:plot_particles_perf} można zauważyć, że sam proces wizualizacji jest kosztowny obliczeniowo. Przeniesienie większej ilości obliczeń na kartę graficzną mając na uwadze choćby zmniejszenie transferu danych pomiędzy procesorem a kartą, dałoby prawdopodobnie znaczące przyspieszenie procesu wizualizacji.
+
 
 \subsection{Analiza stabilności numerycznej}
 
 \paragraph{}
+\begin{figure}[H]
+\input{plots/et_dt}
+\caption{Wykres energii kinetycznej cząstek od czasu $E_c(t)$ w zależności od kroku czasowego $\Delta t$}
+\label{fig:plot_timestep}
+\end{figure}
 
+\par
+Wykres \eqref{fig:plot_timestep} obrazuje po pierwsze stabilność symulacji ze względu na wielkość kroku czasowego, a po drugie podobieństwo przebiegu symulacji przy różnych wartościach kroku czasowego.
+\par
+Można zauważyć, że - gdy wielkość kroku czasowego nie jest za duża i nie powoduje eksplozji numerycznej - ma stosunkowo mały wpływ na zachowanie symulacji. Przebieg krzywych na wykresie (za wyjątkiem dwóch momentów) znacząco od siebie nie odbiega.
+
+\begin{figure}[H]
+\input{plots/et_stiff}
+\caption{Wykres energii kinetycznej cząstek od czasu $E_c(t)$ w zależności od parametru sztywności ścianek $s$}
+\label{fig:plot_stiff}
+\end{figure}
+
+\par
+Wykres \eqref{fig:plot_stiff} przedstawia zachowanie się ścianek naczynia -- mniejsza wartość parametru $s$ oznacza większą `sprężystość' tych ścianek przez co duża część energii cząsteczek jest pochłaniana. Jednak gdy parametr $s$ zostanie ustalony na zbyt niską wartość, siła sprężystości jaką ścianki oddziałują na cząsteczki jest zbyt mała i następuje penetracja ścianek przez cząstki -- co widać na wykresie w momencie $t=0.4$ dla $s=1000$.
+\par
+W praktyce zmniejszenie parametru $s$ pozwala na delikatne poprawienie stabilności numerycznej. Powoduje jednak nienaturalnie wyglądające kolizje cząstek ze ścianami przez co domyślnie ten parametr został ustawiony na stosunkowo wysoką wartość.
 \par

@@ -20,7 +20,7 @@ Kod źródłowy aplikacji dostępny jest w publicznym repozytorium kodu pod adre
 \subsubsection{Schemat blokowy aplikacji}
 
 \centering
-\caption{Diagram}
+\caption{Diagram przebiegu symulacji płynu}
 \includegraphics[width=350pt,keepaspectratio]{diagram.eps}%width=\textwidth,height=\textheight,
 \label{fig:diagram_main}
 \newpage
@@ -110,7 +110,7 @@ Kod źródłowy aplikacji dostępny jest w publicznym repozytorium kodu pod adre
 \subsection{Optymalizacje}
 
 \paragraph{}
-Wydajność aplikacji poprawiać można na wiele sposobów. Najwięcej czasu pochłaniają obliczenia matematyczne związane z symulacją. Tutaj z pomocą przychodzą metody wyszukiwania sąsiadów cząstki koniecznych do obliczenia fizycznych właściwości. Kolejnym `wąskim gardłem' jest czas dostępu do pamięci RAM więc istotna jest lokalność danych i porządkowanie ich w pamięci podręcznej. Odrębnym tematem jest optymalizacja renderowania powierzchni płynu. <<zrównoleglanie obliczeń i GPGPU>>
+Wydajność aplikacji poprawiać można na wiele sposobów. Najwięcej czasu pochłaniają obliczenia matematyczne związane z symulacją. Tutaj z pomocą przychodzą metody wyszukiwania sąsiadów cząstki koniecznych do obliczenia fizycznych właściwości. Kolejnym `wąskim gardłem' jest czas dostępu do pamięci RAM więc istotna jest lokalność danych i porządkowanie ich w pamięci podręcznej. Odrębnym tematem jest optymalizacja renderowania powierzchni płynu.
 \par
 
 \subsubsection{Wyszukiwnie sąsiadów}
@@ -132,10 +132,18 @@ Jednym z typów struktur, które pozwalają poszeregować cząsteczki na grupy s
 Każdej komórce może zostać przypisany indeks, który oblicza się \textbf{dla cząsteczki} według poniższego wzoru, na podstawie jej położenia:
 
 \begin{equation}
-c_{idx} = k + l * K + m * K * L
+c_{idx} = k + l * K + m * K * L,
 \label{eqn:get_cell_index}
 \end{equation}
-gdzie $K$ i $L$ to rozmiary obszaru symulacji w kierunkach $x$ i $y$, a $[k, l, m]$ to położenie komórki w globalnym układzie współrzędnych. Wartości $K$, $L$ i $M$ (rozmiar obszaru symulacji w kierunku $z$), aby zapobiec wprowadzaniu niedokładności związanych z zaokrągleniami liczb przy dzieleniu, są ustawiane jako wielokrotności liczby 2. <<Implementacja funkcji w dodatku/listingu xxx>>.
+gdzie $K$ i $L$ to rozmiary obszaru symulacji w kierunkach $x$ i $y$, a $[k, l, m]$ to położenie komórki w globalnym układzie współrzędnych. Wartości $K$, $L$ i $M$ (rozmiar obszaru symulacji w kierunku $z$), aby zapobiec wprowadzaniu niedokładności związanych z zaokrągleniami liczb przy dzieleniu, są ustawiane jako wielokrotności liczby 2.
+\par
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{grid_sim}
+\caption{Wizualizacja siatki wyszukiwana sąsiadów w symulacji. Przedstawiona siatka jest stosunkowo rzadka: $8\cross8\cross4$. W rozdziale \eqref{subsec:perf_anal} przedstawiona jest analiza wydajności przy wykorzystaniu siatek różnej rozdzielczości}
+\label{fig:ss_grid_sim}
+\end{figure}
 
 \paragraph{}
 Aby zachować optymalne ułożenie danych w pamięci podręcznej, tablica przechowująca cząsteczki jest sortowana ze względu na indeks komórek w której znajdują się cząsteczki - czyli pośrednio ze względu na ich położenie w obszarze symulacji. Dzięki temu cząsteczki znajdujące się w jednej komórce ułożone są blisko siebie również w pamięci. Nie oznacza to jednak, że cząsteczki z sąsiadujących komórek - które również biorą udział w obliczeniach - będą znajdywały się również niedaleko w pamięci. Aby zwiększyć wykorzystanie danych znajdujących się w pamięci podręcznej (ang. cache-hit) wykorzystywane jest kodowanie Mortona/Krzywa-Z (ang. Morton code/Z-Curve) \cite{wiki:3}. Indeksowanie komórek i sortowanie cząsteczek według tej krzywej pozwala na ułożenie cząsteczek znajdujących się w sąsiadujących komórkach bliżej siebie w pamięci.
@@ -146,42 +154,33 @@ Posortowanie cząsteczek pozwala również na uproszczenie struktury komórki, k
 \paragraph{}
 Cały opisany powyżej proces optymalizacji wyszukiwania sąsiadów przedstawiony jest na poniższym schemacie:
 \par
-%schemat blokowy `z-index sort search'
+
 \begin{figure}[h]
 \centering
 \caption{Diagram indeksowania i szeregowania cząsteczek}
-\includegraphics[width=450pt,keepaspectratio]{diagram_zindex.eps}
+\includegraphics[width=450pt,keepaspectratio]{diagram_zindex_pl}
 \label{fig:diagram_zindex}
 \end{figure}
-
-\subsection{Całkowanie numeryczne}
-
-\paragraph{}
-
-\par
-
-\subsubsection{Krok czasowy}
-
-\paragraph{}
-
-\par
 
 \subsection{Parametry symulacji}
 
 \paragraph{}
-Płyn symulowany metodą SPH można <<formułować>> nadając wartości kilku stałych opisujących ten płyn. Niektórych wartości parametrów nie można jednak przepisać bezpośrednio z tablic stałych fizycznych, ponieważ w <<obszarze>> na jakim przeprowadzana jest symulaja nie mają takiego sensu jak w rzeczywistym świecie i nie <<powodują/inicjują>> spodziewanych efektów. Ich wielkości muszą być także dostrajane z myślą o stabilności symulacji, na którą mają duży wpływ. Powyższe kwestie sprawiają, że ustawianie stałych płynu - przynajmniej na początkowych etapach implementacji symulatora - jest trudne i odbywa się metodą prób i błędów. Poniżej umieszczone zostały przykładowe wartości tych parametrów, które dobrze sprawdzają się dla symulacji płynów skonstruowanym algorytmem oraz wskazówki jak dobierać te wielkości.
+Płyn symulowany metodą SPH można fcharakteryzować nadając wartości kilku stałych opisujących ten płyn. Niektórych wartości parametrów nie można jednak przepisać bezpośrednio z tablic stałych fizycznych, ponieważ w obszarze na jakim przeprowadzana jest symulaja nie mają takiego sensu jak w rzeczywistym świecie i nie powodują one spodziewanych efektów. Podawanie więc jednostek dla tych stałych rozmija się z celem, dlatego w tej pracy jednostki stałych zostały pominięte.\\
+Wielkości tych stałych muszą być także dostrajane z myślą o stabilności symulacji, na którą mają duży wpływ. 
+\par
+Powyższe kwestie sprawiają, że ustawianie stałych płynu - przynajmniej na początkowych etapach implementacji symulatora - jest trudne i odbywa się metodą prób i błędów. Poniżej umieszczone zostały przykładowe wartości tych parametrów, które dobrze sprawdzają się dla symulacji płynów skonstruowanym algorytmem oraz wskazówki jak dobierać te wielkości.
 \par
 
 \subsubsection{Objętość symulowanego płynu oraz masa pojedynczej cząsteczki}
 
 \paragraph{}
-Masa pojedynczej cząsteczki wpływa na wielkość sił powstających przy symulacji. Ten parametr jest <<dosyć>> czuły i istotnie wpływa na charakterystykę symulacji jak i jej stabilność. Jego dopasowanie powinno przebiegać równolegle z korektą przede wszystkim kroku czasowego oraz promienia odięcia jądra wygładzającego.
+Masa pojedynczej cząsteczki wpływa na wielkość sił powstających przy symulacji. Ten parametr jest czuły i istotnie wpływa na charakterystykę symulacji jak i jej stabilność. Jego dopasowanie powinno przebiegać równolegle z korektą przede wszystkim kroku czasowego oraz promienia odięcia jądra wygładzającego.
 \par
 
 \subsubsection{Promień odcięcia jądra wygładzającego}
 
 \paragraph{}
-Promień odcięcia $h$ jest wartością mającą duży wpływ na stabilność i wydajność symulacji oraz jakość odwzorowania płynu. Określa on `zasięg widzenia' pojednczej cząsteczki, w którym to szuka swoich sąsiadów - cząsteczek wykorzystywanych do obliczeń parametrów tej cząsteczki. Im więcej sąsiadów, tym zoptymalizowany algorytm ich przeszukiwania \eqref{subsubsec:neighbour_search} osiąga gorszą złóżoność, która z powrotem dąży do $O(n^2)$. Mylnym jest pojęcie o zwiększaniu dokładności symulacji wraz ze zwiększeniem promienia odcięcia. Od pewnego momentu zwiększanie tego parametru powoduje nienaturalne zachowanie się płynu. Siła ciśnienia, która jest odpowiedzialna za utrzymywanie odpowiednich odlegości pomiędzy cząsteczkami staje się zbyt duża i cząsteczki zlepiaja się nienaturalnie.
+Promień odcięcia $h$ ma duży wpływ na stabilność i wydajność symulacji oraz jakość odwzorowania płynu. Określa on `zasięg widzenia' pojedynczej cząsteczki, w którym to szuka swoich sąsiadów - cząsteczek wykorzystywanych do obliczeń parametrów tej cząsteczki. Im więcej sąsiadów, tym zoptymalizowany algorytm ich przeszukiwania \eqref{subsubsec:neighbour_search} osiąga większą złóżoność, która z powrotem dąży do $O(n^2)$. Mylnym jest pojęcie o zwiększaniu dokładności symulacji wraz ze zwiększeniem promienia odcięcia. Od pewnego momentu zwiększanie tego parametru powoduje nienaturalne zachowanie się płynu. Siła ciśnienia, która jest odpowiedzialna za utrzymywanie odpowiednich odlegości pomiędzy cząsteczkami staje się zbyt duża i cząsteczki zlepiają się nienaturalnie.
 \par
 Promień odcięcia może być również zbyt mały. W takim wypadku zbyt mała liczba cząstek jest brana pod uwagę przy obliczaniu parametrów i symulacja znowu staje się nienaturalna. Dodatkowo mały promień negatywnie wpływa na stabilność symulacji.
 \par
@@ -192,7 +191,7 @@ Ustawianie tego parametru, spowodowane przez jego duży wpływ na charakter symu
 \subsubsection{Gęstość spoczynkowa}
 
 \paragraph{}
-Równanie \eqref{eqn:sph_desbrun_pressure} wykorzystuje gęstość spoczynkową do obliczenia ciśnienia dla pojedynczej cząsteczki. Mała wartość tego parametru powoduje, że siła ciśnienia pomiędzy cząsteczkami wzajemnie je odpycha. Odpowiednio go korygując powodujemy zmniejszenie się tej siły odpychającej. W pewnym momencie siła osiąga wartości ujemne i cząsteczki zaczynają się przyciągać. Zbyt duża wartość prowadzi do szybkiego wzrostu wartości ciśnienia co powoduje eksplozję numeryczną.
+Równanie \eqref{eqn:sph_desbrun_pressure} wykorzystuje gęstość spoczynkową do obliczenia ciśnienia dla pojedynczej cząsteczki. Mała wartość tego parametru powoduje, że siła ciśnienia pomiędzy cząsteczkami wzajemnie je odpycha. Odpowiednio go korygując powodujemy zmniejszenie tej siły odpychającej. W pewnym momencie siła osiąga wartości ujemne i cząsteczki zaczynają się przyciągać. Zbyt duża wartość prowadzi do szybkiego wzrostu wartości ciśnienia co powoduje eksplozję numeryczną.
 \par
 
 \subsubsection{Lepkość}
@@ -200,6 +199,25 @@ Równanie \eqref{eqn:sph_desbrun_pressure} wykorzystuje gęstość spoczynkową 
 \paragraph{}
 Stała występująca w równaniu \eqref{eqn:sph_force_viscosity} na siłę lepkości dostosowywana jest ze względu na pożądany charakter symulowanego płynu oraz efekt `wygładzający', który zapobiega nagłym wzrostom prędkości cząsteczek i stabilizuje symulację.
 \par
+
+\begin{figure}[H]
+\input{plots/et_vis}
+\caption{Wykres energii kinetycznej cząstek od czasu $E_c(t)$ w zależności od współczynnika lepkości $\mu$}
+\label{fig:plot_viscosity}
+\end{figure}
+
+\par
+Na wykresie \eqref{fig:plot_viscosity} widać jak energia cząsteczek jest tłumiona przez siłę lepkości. Lepkość wpływa również na przebieg symulacji co widać na wykresie jako różnice w przebiegu krzywych i różne miejsca występowania ekstremów lokalnych.
+\par
+
+\begin{figure}[H]
+\input{plots/et_vis_hdt}
+\caption{Wykres energii kinetycznej cząstek od czasu $E_c(t)$ w zależności od współczynnika lepkości $\mu$, przy dużym kroku czasowym $\Delta t$ = 0.005}
+\label{fig:plot_viscosity_highdt}
+\end{figure}
+
+\par
+Wykres \eqref{fig:plot_viscosity_highdt} obrazuje efekt `wygładzający' siły lepkości. Siła ta przyciąga poszczególne cząsteczki do siebie przez co ich zdolności do nabierania prędkości są ograniczone. Ten efekt pozwala na przeprowadzenie stabilnej symulacji dla większego kroku czasowego. Jednak, jak można zauważyć na wykresie, przy średnich wartościach stałej siły lepkości $\mu$ ($0.5$ i $1.5$) i sporym kroku czasowym wybuch symulacji jest nieuchronny (następuje przy $t$ wynoszącym ok. $0.65$).
 
 \subsubsection{Napięcie powierzchniowe}
 
