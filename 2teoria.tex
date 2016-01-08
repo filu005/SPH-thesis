@@ -57,13 +57,13 @@ gdzie:
 
 \begin{itemize}[noitemsep,topsep=0pt,parsep=0pt,partopsep=0pt]
 \renewcommand\labelitemi{--}
-\item $ A_S $ - interpolacja pola w pozycji $\boldsymbol{r}$
-\item $j$ - cząsteczki po których następuje iteracja
-\item $m_j$ - masa $j$-tej cząsteczki
-\item $\boldsymbol{r}_j$ - pozycja $j$-tej cząsteczki
-\item $\rho_j$ - gęstość $j$-tej cząsteczki
-\item $A_j$ - wartość pola w punkcie $\boldsymbol{r}_j$
-\item $W(\boldsymbol{r}-\boldsymbol{r}_j, h)$ - jądro wygładzające dla j-tej cząsteczki (tj. jej odległości od pozycji $\boldsymbol{r}$: $\| \boldsymbol{r}-\boldsymbol{r}_j \|$)
+\item $ A_S $ - interpolacja pola w pozycji $\boldsymbol{r}$,
+\item $j$ - cząsteczki po których następuje iteracja,
+\item $m_j$ - masa $j$-tej cząsteczki,
+\item $\boldsymbol{r}_j$ - pozycja $j$-tej cząsteczki,
+\item $\rho_j$ - gęstość $j$-tej cząsteczki,
+\item $A_j$ - wartość pola w punkcie $\boldsymbol{r}_j$,
+\item $W(\boldsymbol{r}-\boldsymbol{r}_j, h)$ - jądro wygładzające dla j-tej cząsteczki (tj. jej odległości od pozycji $\boldsymbol{r}$: $\| \boldsymbol{r}-\boldsymbol{r}_j \|$).
 \end{itemize}
 \end{samepage}
 \vspace{3ex}
@@ -93,12 +93,12 @@ Laplasjan pola $A_S(\boldsymbol{r})$ zapisuje się jako:
 \paragraph{}
 Funkcja $W(\boldsymbol{r}, h)$ to jądro wygładzające (ang. smoothing kernel) o promieniu $h$. Taka funkcja musi spełniać dwa następujące warunki:
 \begin{itemize}
-\item normalizacja: $$\int_{\Omega} W(\boldsymbol{r}, h) d\boldsymbol{r} = 1$$;
-\item zbieżność do delty Diraca przy $h$ dążącym do 0: $$\lim_{h\to0} W(\boldsymbol{r}, h) = \delta(\boldsymbol{r})$$.
+\item normalizacja: $$\int_{\Omega} W(\boldsymbol{r}, h) d\boldsymbol{r} = 1;$$
+\item zbieżność do delty Diraca przy $h$ dążącym do 0: $$\lim_{h\to0} W(\boldsymbol{r}, h) = \delta(\boldsymbol{r}).$$
 \end{itemize}
 \vspace{3ex}
 \noindent
-Oprócz powyższych warunków funkcja jądra wygładzającego musi być dodatnia: $$W(\boldsymbol{r}, h) \ge 0$$ aby mogła pełnić rolę uśredniającą. Kiedy dodamy jeszcze jeden warunek funkcji jądra - symetrię: $$W(\boldsymbol{r}, h) = W(\boldsymbol{-r}, h)$$ wtedy interpolacja jest drugiego stopnia precyzji, to znaczy że błąd przybliżenia sumowania w równaniu~\eqref{eqn:sph} jest równy $O(h^{2})$ lub lepszy. Jądro zanika dla promienia większego od $\boldsymbol{r}$: $$W(\boldsymbol{r}, h) = 0, \| \mathbf{r} \| > h$$.
+Oprócz powyższych warunków funkcja jądra wygładzającego musi być dodatnia: $$W(\boldsymbol{r}, h) \ge 0$$ aby mogła pełnić rolę uśredniającą. Kiedy dodamy jeszcze jeden warunek funkcji jądra - symetrię: $$W(\boldsymbol{r}, h) = W(\boldsymbol{-r}, h)$$ wtedy interpolacja jest drugiego stopnia precyzji, to znaczy że błąd przybliżenia sumowania w równaniu~\eqref{eqn:sph} jest równy $O(h^{2})$ lub lepszy. Jądro zanika dla promienia większego od $\boldsymbol{r}$: $$W(\boldsymbol{r}, h) = 0, \| \mathbf{r} \| > h.$$
 \par
 
 \paragraph{}
